@@ -43,3 +43,9 @@ def send_ccx_course_published(course_key):
         )
         for rec, response in responses:
             log.info('Signal fired when course is published. Receiver: %s. Response: %s', rec, response)
+
+from celery.task import task
+
+@task(name='ccx.print')
+def send_emails():
+    print("CCXCXCXCXCX Send emails....!!!")
