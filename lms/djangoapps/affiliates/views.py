@@ -1,5 +1,6 @@
 from django.shortcuts import render, redirect
 from django.http import Http404
+from django.core.urlresolvers import reverse
 from lms.envs.common import STATE_CHOICES
 from django_countries import countries
 from edxmako.shortcuts import render_to_response, render_to_string
@@ -49,7 +50,7 @@ def create(request):
 
     affiliate.save()
 
-    url = reverse("affiliates_show", kwargs={'pk': affiliate.pk})
+    url = reverse("affiliates_show", args={affiliate.pk})
     return redirect(url)
 
 def edit(request, pk):
@@ -71,7 +72,7 @@ def edit(request, pk):
 
         affiliate.save()
 
-        url = reverse("affiliates_show", kwargs={'pk': affiliate.pk})
+        url = reverse("affiliates_show", args={affiliate.pk})
         return redirect(url)
         
     
