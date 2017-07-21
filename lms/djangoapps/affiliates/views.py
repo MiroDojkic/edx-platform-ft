@@ -33,7 +33,7 @@ def show(request, pk):
 
 def create(request):
     return render_to_response('affiliates/form.html', {
-        'affiliate': AffiliateEntity.new(),
+        'affiliate': AffiliateEntity(),
         'state_choices': STATE_CHOICES,
         'countries': countries
     })

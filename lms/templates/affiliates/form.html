@@ -2,7 +2,13 @@
 <%inherit file="/main.html" />
 <%namespace name='static' file='/static_content.html'/>
 
-<%block name="pagetitle">Edit Affiliate ${affiliate.name}</%block>
+<%block name="pagetitle">
+  % if affiliate.pk:
+    Edit Affiliate ${affiliate.name}
+  % else:
+    Create Affiliate
+  % endif
+</%block>
 
 <section class="course-info">
   % if error_message:
@@ -11,7 +17,11 @@
 
   <form class="edit-affiliate-container" action="/affiliates/edit/${affiliate.pk}" method="POST" enctype="multipart/form-data">
     <br>
-    <h1 class="explore-header">Edit Affiliate Info</h1>
+    % if affiliate.pk:
+      <h1 class="explore-header">Edit Affiliate Profile</h1>
+    % else:
+      <h1 class="explore-header">Create Affiliate</h1>
+    % endif
 
     <br>
     <div>
