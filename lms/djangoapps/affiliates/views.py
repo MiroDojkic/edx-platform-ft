@@ -1,10 +1,11 @@
 from django.shortcuts import render, redirect
 from django.http import Http404
-from django.core.urlresolvers import reverse
 from lms.envs.common import STATE_CHOICES
 from django_countries import countries
 from edxmako.shortcuts import render_to_response, render_to_string
-from .models import AffiliateEntity
+from .models import AffiliateEntity, AffiliateMembership
+from django.contrib.auth.models import User
+
 
 # Create your views here.
 def index(request):
@@ -22,15 +23,13 @@ def index(request):
     })
 
 
-
 def show(request, pk):
     affiliate = AffiliateEntity.objects.get(pk=pk)
-    # courses = CustomCourseForEdX.objects.filter(coach=affiliate, enrollment_type=CustomCourseForEdX.PUBLIC, id=F('original_ccx_id'))
 
     return render_to_response('affiliates/show.html', {
-        'affiliate': affiliate,
-        'courses': []
+        'affiliate': affiliate
     })
+
 
 def new(request):
     return render_to_response('affiliates/form.html', {
@@ -38,6 +37,7 @@ def new(request):
         'state_choices': STATE_CHOICES,
         'countries': countries
     })
+
 
 def create(request):
     affiliate = AffiliateEntity()
@@ -50,8 +50,8 @@ def create(request):
 
     affiliate.save()
 
-    url = reverse("affiliates_show", args={affiliate.pk})
-    return redirect(url)
+    return redirect('affiliates:show', pk=affiliate.pk)
+
 
 def edit(request, pk):
     affiliate = AffiliateEntity.objects.get(pk=pk)
@@ -71,10 +71,8 @@ def edit(request, pk):
                 setattr(affiliate, key, request.POST[key])
 
         affiliate.save()
-
-        url = reverse("affiliates_show", args={affiliate.pk})
-        return redirect(url)
-        
+    
+        return redirect('affiliates:show', pk=affiliate.pk)  
     
     return render_to_response('affiliates/form.html', {
         'affiliate': affiliate,
@@ -82,3 +80,29 @@ def edit(request, pk):
         'countries': countries
     })
     
+
+def add_member(request, pk):
+    params = {
+        'affiliate': AffiliateEntity.objects.get(pk=pk),
+        'member_id': request.POST.get('member_id'),
+        'role': request.POST.get('role'),
+    }
+
+    membership = AffiliateMembership.objects.create(**params)
+
+    return render_to_response('affiliates/form.html', {
+        'affiliate': params['affiliate']
+    })
+
+
+def remove_member(request, pk):
+    params = {
+        'affiliate': AffiliateEntity.objects.get(pk=pk),
+        'member_id': request.DELETE.get('member_id')
+    }
+
+    AffiliateMembership.objects.filter(**params).delete()
+
+    return render_to_response('affiliates/form.html', {
+        'affiliate': params['affiliate']
+    })

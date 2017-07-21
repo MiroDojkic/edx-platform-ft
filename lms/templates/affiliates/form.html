@@ -15,6 +15,25 @@
     <div class="image-upload-error-message">${error_message}</div>
   % endif
 
+  <div class="edit-affiliate-container">
+    <h1 class="explore-header">Membership</h1>
+
+    <table>
+      <thead>
+        <th>Name</th>
+        <th>Email</th>
+        <th>Role</th>
+      </thead>
+      % for member in affiliate.members.all():
+        <tr>
+          <td>${member.profile.name}</td>
+          <td>${member.email}</td>
+          <td>${member}</td>
+        </tr>
+      % endfor
+    </table>
+  </div>
+
   
   % if affiliate.pk:
     <form class="edit-affiliate-container" action="/affiliates/edit/${affiliate.pk}" method="POST" enctype="multipart/form-data">

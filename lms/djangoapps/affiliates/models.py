@@ -2,6 +2,7 @@ from django.db import models
 from django.contrib.auth.models import User
 from lms.envs.common import STATE_CHOICES
 from django_countries.fields import CountryField
+from lms.djangoapps.ccx.models import CustomCourseForEdX
 
 
 def user_directory_path(instance, filename):
@@ -27,6 +28,11 @@ class AffiliateEntity(models.Model):
 
     def __unicode__(self):
         return self.name
+
+    @property
+    def courses(self):
+        return CustomCourseForEdX.objects.filter(coach__in=self.members.all())
+
 
 
 class AffiliateMembership(models.Model):
