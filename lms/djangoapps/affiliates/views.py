@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.http import Http404
 from lms.envs.common import STATE_CHOICES
 from django_countries import countries
@@ -31,12 +31,26 @@ def show(request, pk):
         'courses': []
     })
 
-def create(request):
+def new(request):
     return render_to_response('affiliates/form.html', {
         'affiliate': AffiliateEntity(),
         'state_choices': STATE_CHOICES,
         'countries': countries
     })
+
+def create(request):
+    affiliate = AffiliateEntity()
+    
+    for key in request.POST:
+        if key == 'year_of_birth':
+            setattr(affiliate, key, int(request.POST[key]))
+        else:
+            setattr(affiliate, key, request.POST[key])
+
+    affiliate.save()
+
+    url = reverse("affiliates_show", kwargs={'pk': affiliate.pk})
+    return redirect(url)
 
 def edit(request, pk):
     affiliate = AffiliateEntity.objects.get(pk=pk)
@@ -56,6 +70,9 @@ def edit(request, pk):
                 setattr(affiliate, key, request.POST[key])
 
         affiliate.save()
+
+        url = reverse("affiliates_show", kwargs={'pk': affiliate.pk})
+        return redirect(url)
         
     
     return render_to_response('affiliates/form.html', {

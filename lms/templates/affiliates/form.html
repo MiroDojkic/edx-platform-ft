@@ -15,7 +15,13 @@
     <div class="image-upload-error-message">${error_message}</div>
   % endif
 
-  <form class="edit-affiliate-container" action="/affiliates/edit/${affiliate.pk}" method="POST" enctype="multipart/form-data">
+  
+  % if affiliate.pk:
+    <form class="edit-affiliate-container" action="/affiliates/edit/${affiliate.pk}" method="POST" enctype="multipart/form-data">
+  % else:
+    <form class="edit-affiliate-container" action="/affiliates/new" method="POST" enctype="multipart/form-data">
+  % endif
+
     <br>
     % if affiliate.pk:
       <h1 class="explore-header">Edit Affiliate Profile</h1>
