@@ -3,12 +3,7 @@
 <%inherit file="/main.html" />
 <%namespace name='static' file='/static_content.html'/>
 
-<%block name="pagetitle">Affiliate ${affiliate.profile.name}</%block>
-
-<%
-  from openedx.core.djangoapps.user_api.accounts.image_helpers import get_profile_image_urls_for_user
-  image_url = get_profile_image_urls_for_user(affiliate)['full']
-%>
+<%block name="pagetitle">Affiliate ${affiliate.name}</%block>
 
 <section class="course-info">
   <header class="course-profile">
@@ -17,20 +12,20 @@
         <section class="intro">
           <div class="heading-group">
             <h1>
-              ${affiliate.profile.affiliate_organization_name}
+              ${affiliate.name}
             </h1>
           </div>
 
           <div class="main-cta">
             <div class="fa fa-map-marker"></div>
-            ${affiliate.profile.city}
-            , ${affiliate.profile.state}
+            ${affiliate.city}
+            , ${affiliate.state}
           </div>
         </section>
 
         <div class="media">
           <div class="hero">
-            <img src="${image_url}" alt="" />
+            <img src="${affiliate.image and affiliate.image.url}" alt="" />
           </div>
         </div>
       </div>
@@ -42,7 +37,7 @@
 
       <div class="inner-wrapper">
         <h4>Description</h4>
-        <p>${affiliate.profile.description}</p>
+        <p>${affiliate.description}</p>
 
         <br><br>
         <h4>Affiliate Courses</h4>
@@ -50,7 +45,7 @@
           <ul>
             % for course in courses:
               <li class="affiliate-card">
-                <div class="image" style="background-image: url(${image_url});"></div>
+                <div class="image" style="background-image: url(${affiliate.image and affiliate.image.url});"></div>
                 <div class="name">
                   ${course.display_name}
                 </div>
@@ -92,12 +87,12 @@
         <ul class="contact-info">
           <li>
             <div class="fa fa-envelope"></div>
-            <a href="mailto:${affiliate.email}">${affiliate.profile.public_email}</a>
+            <a href="mailto:${affiliate.email}">${affiliate.email}</a>
           </li>
 
           <li>
             <div class="fa fa-phone-square"></div>
-            <a href="tel:${affiliate.profile.phone_number}">${affiliate.profile.phone_number}</a>
+            <a href="tel:${affiliate.phone_number}">${affiliate.phone_number}</a>
           </li>
         </ul>
       </div>

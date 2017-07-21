@@ -4,27 +4,7 @@
 
 <%block name="pagetitle">Explore Affiliates</%block>
 
-<%
-  from openedx.core.djangoapps.user_api.accounts.image_helpers import get_profile_image_urls_for_user
-%>
-
 <section class="container explore-affiliates">
-
-  <script type="text/javascript">
-    function searchAffiliates() {
-      var affiliateName = $('#affiliateName').val()
-      var affiliateCity = $('#affiliateCity').val()
-      var affiliateState = $('#affiliateState').val()
-
-      var search = '&affiliate_name=' + affiliateName;
-      search += '&affiliate_city=' + affiliateCity;
-      search += '&affiliate_state=' + affiliateState;
-
-      window.location.search = search;
-    }
-  </script>
-
-
   <script type="text/javascript">
     $(document).ready(function() {
       $('.wrapper-footer').addClass('fixed-footer')
@@ -75,22 +55,22 @@
     <ul>
       % for affiliate in affiliates:
         <li class="affiliate-card">
-          <div class="image" style="background-image: url(${affiliate['image_url']});"></div>
+          <div class="image" style="background-image: url(${affiliate.image and affiliate.image.url});"></div>
           <div class="name">
-            ${affiliate['affiliate_organization_name']}
+            ${affiliate.name}
           </div>
           <div class="description">
-            ${affiliate['description']}
+            ${affiliate.description}
           </div>
           <div class="card-footer">
             <span class="skewed-footer-item">
               <span>
                 <span class="fa fa-map-marker"></span>
-                ${affiliate['state']}
+                ${affiliate.state}
               </span>
             </span>
             <span>
-              <a href="/affiliates/${affiliate['username']}">
+              <a href="/affiliates/${affiliate.pk}">
                 View
                 <span class="fa fa-arrow-circle-o-right"></span>
               </a>
