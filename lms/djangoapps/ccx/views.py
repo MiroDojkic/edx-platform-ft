@@ -155,11 +155,11 @@ def edit_ccx_context(course, ccx, user):
         'save_ccx', kwargs={'course_id': ccx_locator})
 
     ccx_members = CourseEnrollment.objects.filter(course_id=ccx_locator, is_active=True)
+    non_student_user_ids = CourseAccessRole.objects.filter(course_id=ccx_locator).values_list('user_id', flat=True)
 
-    onlyStudents = lambda member: not CourseAccessRole.objects.filter(course_id=ccx_locator, user=member.user).exists()
+    only_students = lambda member: not member.user.id in non_student_user_ids
 
-    context['ccx_members'] = ccx_members
-    context['ccx_students'] = filter(onlyStudents, ccx_members)
+    context['ccx_students'] = filter(only_students, ccx_members)
     context['gradebook_url'] = reverse(
         'ccx_gradebook', kwargs={'course_id': ccx_locator})
     context['grades_csv_url'] = reverse(
@@ -218,11 +218,11 @@ def dashboard(request, course, ccx=None):
         context['edit_current'] = False
 
         ccx_members = CourseEnrollment.objects.filter(course_id=ccx_locator)
-
-        onlyStudents = lambda member: not CourseAccessRole.objects.filter(course_id=ccx_locator, user=member.user).exists()
+        non_student_user_ids = CourseAccessRole.objects.filter(course_id=ccx_locator).values_list('user_id', flat=True)
+        only_students = lambda member: not member.user.id in non_student_user_ids
 
         # show students on Student Admin tab
-        context['enrollments'] = filter(onlyStudents, ccx_members)
+        context['enrollments'] = filter(only_students, ccx_members)
     else:
         context['create_ccx_url'] = reverse(
             'create_ccx', kwargs={'course_id': course.id})
