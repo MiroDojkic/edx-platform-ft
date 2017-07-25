@@ -36,13 +36,13 @@
         <th>Role</th>
         <th></th>
       </thead>
-      % for member in affiliate.members.all():
+      % for membership in affiliate.memberships:
         <tr>
-          <td>${member.profile.name}</td>
-          <td>${member.email}</td>
-          <td>${member}</td>
+          <td>${membership.member.profile.name}</td>
+          <td>${membership.member.email}</td>
+          <td>${membership.get_role_display()}</td>
           <td>
-            <a href="${affiliate.id}/remove_member/${member.id}">
+            <a href="${affiliate.id}/remove_member/${membership.member.id}">
               Remove
             </a>
           </td>
