@@ -42,6 +42,11 @@ def new(request):
 def create(request):
     affiliate = AffiliateEntity()
     
+    # delete image from POST since we pull it from FILES    
+    request.POST.pop('image', None)
+    
+    setattr(affiliate, 'image', request.FILES['image'])
+
     for key in request.POST:
         if key == 'year_of_birth':
             setattr(affiliate, key, int(request.POST[key]))
@@ -56,14 +61,14 @@ def create(request):
 def edit(request, pk):
     affiliate = AffiliateEntity.objects.get(pk=pk)
 
-    # TODO implement interceptor
-    allow_access = True
-
-    # TODO: throw 403
-    if not allow_access:
-        raise Http404
-
+    
     if request.method == 'POST':
+        # delete image from POST since we pull it from FILES
+        request.POST.pop('image', None)
+        
+        if request.FILES and request.FILES['image']:
+            setattr(affiliate, 'image', request.FILES['image'])
+        
         for key in request.POST:
             if key == 'year_of_birth':
                 setattr(affiliate, key, int(request.POST[key]))
