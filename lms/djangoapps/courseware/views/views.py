@@ -152,6 +152,8 @@ def courses(request):
 
     if should_hide_master_course:
         courses = CourseOverview.objects.filter(id__in=ccx_keys)
+    elif request.user.is_staff:
+        courses = CourseOverview.objects.filter(Q(id__in=ccx_keys) | ~Q(id__startswith='ccx'))
     else:
         courses = CourseOverview.objects.filter(Q(id__in=ccx_keys) | ~Q(id__startswith='ccx')).filter(invitation_only=0)
 
@@ -188,9 +190,11 @@ def get_should_hide_master_course(request):
 def build_ccx_filters(request):
     filter_fields = ['location_city', 'location_state', 'delivery_mode', 'coach_id']
     filters = {
-        'id': F('original_ccx_id'),
-        'enrollment_type': CustomCourseForEdX.PUBLIC
+        'id': F('original_ccx_id')
     }
+
+    if not request.user.is_staff:
+        filters['enrollment_type'] = CustomCourseForEdX.PUBLIC
 
     for field in filter_fields:
         value = request.POST.get(field)
