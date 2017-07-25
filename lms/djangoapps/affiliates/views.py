@@ -5,6 +5,7 @@ from django_countries import countries
 from edxmako.shortcuts import render_to_response, render_to_string
 from .models import AffiliateEntity, AffiliateMembership
 from django.contrib.auth.models import User
+from lms.djangoapps.instructor.views.tools import get_student_from_identifier
 
 
 # Create your views here.
@@ -35,16 +36,17 @@ def new(request):
     return render_to_response('affiliates/form.html', {
         'affiliate': AffiliateEntity(),
         'state_choices': STATE_CHOICES,
-        'countries': countries
+        'countries': countries,
+        'role_choices': AffiliateMembership.role_choices
     })
 
 
 def create(request):
     affiliate = AffiliateEntity()
-    
-    # delete image from POST since we pull it from FILES    
+
+    # delete image from POST since we pull it from FILES
     request.POST.pop('image', None)
-    
+
     setattr(affiliate, 'image', request.FILES['image'])
 
     for key in request.POST:
@@ -61,14 +63,14 @@ def create(request):
 def edit(request, pk):
     affiliate = AffiliateEntity.objects.get(pk=pk)
 
-    
+
     if request.method == 'POST':
         # delete image from POST since we pull it from FILES
         request.POST.pop('image', None)
-        
+
         if request.FILES and request.FILES['image']:
             setattr(affiliate, 'image', request.FILES['image'])
-        
+
         for key in request.POST:
             if key == 'year_of_birth':
                 setattr(affiliate, key, int(request.POST[key]))
@@ -76,38 +78,37 @@ def edit(request, pk):
                 setattr(affiliate, key, request.POST[key])
 
         affiliate.save()
-    
-        return redirect('affiliates:show', pk=affiliate.pk)  
-    
+
+        return redirect('affiliates:show', pk=affiliate.pk)
+
     return render_to_response('affiliates/form.html', {
         'affiliate': affiliate,
         'state_choices': STATE_CHOICES,
-        'countries': countries
+        'countries': countries,
+        'role_choices': AffiliateMembership.role_choices
     })
-    
+
 
 def add_member(request, pk):
+    member = get_student_from_identifier(request.POST.get('member_identifier'))
     params = {
         'affiliate': AffiliateEntity.objects.get(pk=pk),
-        'member_id': request.POST.get('member_id'),
+        'member': member,
         'role': request.POST.get('role'),
     }
 
     membership = AffiliateMembership.objects.create(**params)
 
-    return render_to_response('affiliates/form.html', {
-        'affiliate': params['affiliate']
-    })
+    return redirect('affiliates:edit', pk=pk)
 
 
-def remove_member(request, pk):
+def remove_member(request, pk, member_id):
     params = {
         'affiliate': AffiliateEntity.objects.get(pk=pk),
-        'member_id': request.DELETE.get('member_id')
+        'member_id': member_id
     }
 
     AffiliateMembership.objects.filter(**params).delete()
 
-    return render_to_response('affiliates/form.html', {
-        'affiliate': params['affiliate']
-    })
+    return redirect('affiliates:edit', pk=pk)
+

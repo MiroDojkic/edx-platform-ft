@@ -18,6 +18,22 @@
   <div class="edit-affiliate-container">
     <h1 class="explore-header">Membership</h1>
 
+    <form action="${affiliate.pk}/add_member" method="POST">
+      <br>
+      <br>
+      <input type="text" name="member_identifier" placeholder="member email/username" />
+      <br>
+      <select name="role">
+        % for role_choice in role_choices:
+          <option value="${role_choice[0]}">${role_choice[1]}</option>
+        % endfor
+      </select>
+      <br>
+      <br>
+      <input type="hidden" name="csrfmiddlewaretoken" value="${csrf_token}" />    
+      <input type="submit" value="Add" />
+    </form>
+
     <table>
       <thead>
         <th>Name</th>
@@ -29,6 +45,11 @@
           <td>${member.profile.name}</td>
           <td>${member.email}</td>
           <td>${member}</td>
+          <td>
+            <a href="${affiliate.id}/remove_member/${member.id}">
+              Remove
+            </a>
+          </td>
         </tr>
       % endfor
     </table>
