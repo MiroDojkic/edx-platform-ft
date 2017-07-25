@@ -157,8 +157,7 @@ def edit_ccx_context(course, ccx, user):
     non_student_user_ids = CourseAccessRole.objects.filter(course_id=ccx_locator).values_list('user_id', flat=True)
     ccx_student_enrollments = CourseEnrollment.objects.filter(course_id=ccx_locator, is_active=True).exclude(user_id__in=non_student_user_ids)
 
-
-    context['ccx_students'] = ccx_student_enrollments
+    context['ccx_student_enrollments'] = ccx_student_enrollments
     context['gradebook_url'] = reverse(
         'ccx_gradebook', kwargs={'course_id': ccx_locator})
     context['grades_csv_url'] = reverse(
@@ -220,7 +219,7 @@ def dashboard(request, course, ccx=None):
         ccx_student_enrollments = CourseEnrollment.objects.filter(course_id=ccx_locator).exclude(user_id__in=non_student_user_ids)
 
         # show students on Student Admin tab
-        context['enrollments'] = ccx_student_enrollments
+        context['ccx_student_enrollments'] = ccx_student_enrollments
     else:
         context['create_ccx_url'] = reverse(
             'create_ccx', kwargs={'course_id': course.id})
