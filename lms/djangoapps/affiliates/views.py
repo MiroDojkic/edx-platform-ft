@@ -6,7 +6,7 @@ from edxmako.shortcuts import render_to_response, render_to_string
 from .models import AffiliateEntity, AffiliateMembership
 from django.contrib.auth.models import User
 from lms.djangoapps.instructor.views.tools import get_student_from_identifier
-
+from .decorators import only_program_director
 
 # Create your views here.
 def index(request):
@@ -31,7 +31,7 @@ def show(request, pk):
         'affiliate': affiliate
     })
 
-
+@only_program_director
 def new(request):
     return render_to_response('affiliates/form.html', {
         'affiliate': AffiliateEntity(),
@@ -41,6 +41,7 @@ def new(request):
     })
 
 
+@only_program_director
 def create(request):
     affiliate = AffiliateEntity()
 
@@ -60,6 +61,7 @@ def create(request):
     return redirect('affiliates:show', pk=affiliate.pk)
 
 
+@only_program_director
 def edit(request, pk):
     affiliate = AffiliateEntity.objects.get(pk=pk)
 
@@ -89,6 +91,7 @@ def edit(request, pk):
     })
 
 
+@only_program_director
 def add_member(request, pk):
     member = get_student_from_identifier(request.POST.get('member_identifier'))
     params = {
@@ -102,6 +105,7 @@ def add_member(request, pk):
     return redirect('affiliates:edit', pk=pk)
 
 
+@only_program_director
 def remove_member(request, pk, member_id):
     params = {
         'affiliate': AffiliateEntity.objects.get(pk=pk),
