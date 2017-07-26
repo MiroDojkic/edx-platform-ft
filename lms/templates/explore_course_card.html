@@ -45,8 +45,8 @@ from lms.djangoapps.ccx.models import CustomCourseForEdX
             </h2>
             <p class="course-overview">
                 % if hasattr(course.id, 'ccx'):
-                  % if len(ccx.course_description) > 100:
-                    <span>${ccx.course_description[:100] + '...'}</span>
+                  % if len(ccx.course_description) > 120:
+                    <span>${ccx.course_description[:120] + '...'}</span>
                   % else:
                       <span>${ccx.course_description}</span>
                   % endif
