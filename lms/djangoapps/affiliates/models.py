@@ -3,6 +3,7 @@ from django.db.models import Q, F
 from django.db.models.signals import post_save, post_delete
 from django.dispatch import receiver
 from django.contrib.auth.models import User
+from django.conf import settings
 from lms.envs.common import STATE_CHOICES
 from django_countries.fields import CountryField
 from lms.djangoapps.ccx.models import CustomCourseForEdX
@@ -10,7 +11,8 @@ from instructor.access import allow_access, revoke_access
 from ccx_keys.locator import CCXLocator
 from courseware.courses import get_course_by_id
 from contextlib import contextmanager
-
+from courseware.courses import get_course_with_access, get_course_by_id
+from opaque_keys.edx.keys import CourseKey
 
 
 def user_directory_path(instance, filename):
@@ -78,6 +80,13 @@ def add_affiliate_course_enrollments(sender, instance, **kwargs):
             with ccx_course(ccx_locator) as course:
                 allow_access(course, instance.member, instance.role, False)
 
+    # Program Director needs to be CCX coach on FastTrac course
+    if instance.role == 'staff':
+        course_id = CourseKey.from_string(settings.FASTTRAC_COURSE_KEY)
+        course = get_course_by_id(course_id)
+        allow_access(course, instance.member, 'ccx_coach', False)
+
+
 
 @receiver(post_delete, sender=AffiliateMembership, dispatch_uid="remove_affiliate_course_enrollments")
 def remove_affiliate_course_enrollments(sender, instance, **kwargs):
@@ -88,3 +97,8 @@ def remove_affiliate_course_enrollments(sender, instance, **kwargs):
         with ccx_course(ccx_locator) as course:
             revoke_access(course, instance.member, instance.role, False)
 
+    # Remove CCX coach on FastTrac course
+    if instance.role == 'staff':
+        course_id = CourseKey.from_string(settings.FASTTRAC_COURSE_KEY)
+        course = get_course_by_id(course_id)
+        revoke_access(course, instance.member, 'ccx_coach', False)

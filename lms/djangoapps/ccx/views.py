@@ -96,8 +96,8 @@ def coach_dashboard(view):
             except CustomCourseForEdX.DoesNotExist:
                 raise Http404
 
-        if ccx:
-            course_key = ccx.course_id
+        # if ccx:
+        #     course_key = ccx.course_id
         course = get_course_by_id(course_key, depth=None)
         is_staff = has_access(request.user, 'staff', course)
         is_instructor = has_access(request.user, 'instructor', course)
@@ -107,9 +107,9 @@ def coach_dashboard(view):
         elif is_staff or is_instructor:
             return view(request, course, ccx)
         else:
-            # role = CourseCcxCoachRole(course_key)
-            # if not role.has_user(request.user):
-            #     return HttpResponseForbidden(_('You must be a CCX Coach to access this view.'))
+            role = CourseCcxCoachRole(course_key)
+            if not role.has_user(request.user):
+                return HttpResponseForbidden(_('You must be a CCX Coach to access this view.'))
 
             # if there is a ccx, we must validate that it is the ccx for this coach
             if ccx is not None:
