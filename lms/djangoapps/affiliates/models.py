@@ -13,6 +13,7 @@ from courseware.courses import get_course_by_id
 from contextlib import contextmanager
 from courseware.courses import get_course_with_access, get_course_by_id
 from opaque_keys.edx.keys import CourseKey
+from student.models import CourseAccessRole
 
 
 def user_directory_path(instance, filename):
@@ -36,6 +37,9 @@ class AffiliateEntity(models.Model):
     image = models.ImageField(upload_to=user_directory_path, null=True, blank=True)
 
     members = models.ManyToManyField(User, through='AffiliateMembership')
+
+    class Meta:
+        unique_together = ('email', 'name')
 
     def __unicode__(self):
         return self.name
@@ -78,15 +82,19 @@ def add_affiliate_course_enrollments(sender, instance, **kwargs):
         for ccx in instance.affiliate.courses:
             ccx_locator = CCXLocator.from_course_locator(ccx.course_id, ccx.id)
             with ccx_course(ccx_locator) as course:
-                allow_access(course, instance.member, instance.role, False)
+                try:
+                    allow_access(course, instance.member, instance.role, False)
+                except:
+                    print 'Allow access failed.'
 
     # Program Director needs to be CCX coach on FastTrac course
     if instance.role == 'staff':
         course_id = CourseKey.from_string(settings.FASTTRAC_COURSE_KEY)
         course = get_course_by_id(course_id)
-        allow_access(course, instance.member, 'ccx_coach', False)
-
-
+        try:
+            allow_access(course, instance.member, 'ccx_coach', False)
+        except:
+            print 'CCX coach failed.'
 
 @receiver(post_delete, sender=AffiliateMembership, dispatch_uid="remove_affiliate_course_enrollments")
 def remove_affiliate_course_enrollments(sender, instance, **kwargs):
