@@ -131,12 +131,20 @@ h1.explore-header {
     margin-right: 1rem;
 
     .image {
-      height: 8rem;
+      height: 12rem;
       border-bottom: 1px solid #aaa;
       width: 20rem;
       background-repeat: no-repeat;
       background-size: 100% 100%;
       display: block;
+    }
+
+    // text ellipsis
+    .name, .description {
+      width: 18rem;
+      text-overflow: ellipsis;
+      overflow: hidden;
+      white-space: nowrap;
     }
 
     .name {
@@ -151,6 +159,7 @@ h1.explore-header {
       padding: 1rem;
       color: #555;
       font-size: .9rem;
+      padding-top: 0;
     }
 
     .card-footer {

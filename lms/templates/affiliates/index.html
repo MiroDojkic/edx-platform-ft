@@ -64,10 +64,10 @@
       % for affiliate in affiliates:
         <li class="affiliate-card">
           <div class="image" style="background-image: url(${affiliate.image and affiliate.image.url});"></div>
-          <div class="name">
+          <div class="name" title="${affiliate.name}">
             ${affiliate.name}
           </div>
-          <div class="description">
+          <div class="description" title="${affiliate.description}">
             ${affiliate.description}
           </div>
           <div class="card-footer">
