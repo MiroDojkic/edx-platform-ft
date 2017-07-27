@@ -55,6 +55,7 @@ def new(request):
 @only_program_director
 def create(request):
     affiliate = AffiliateEntity()
+    program_director_identifier = request.POST.pop('member_identifier', None)
 
     # delete image from POST since we pull it from FILES
     request.POST.pop('image', None)
@@ -69,6 +70,11 @@ def create(request):
             setattr(affiliate, key, request.POST[key])
 
     affiliate.save()
+
+    # SurveyGizmo functionality to automatically add Program Director upon creation
+    if program_director_identifier:
+        member = get_student_from_identifier(program_director_identifier)
+        AffiliateMembership.objects.create(affiliate=affiliate, member=member, role='staff')
 
     return redirect('affiliates:show', pk=affiliate.pk)
 
