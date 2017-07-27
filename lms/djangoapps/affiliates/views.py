@@ -6,7 +6,7 @@ from edxmako.shortcuts import render_to_response, render_to_string
 from .models import AffiliateEntity, AffiliateMembership
 from django.contrib.auth.models import User
 from lms.djangoapps.instructor.views.tools import get_student_from_identifier
-from .decorators import only_program_director
+from .decorators import only_program_director, only_staff
 
 # Create your views here.
 def index(request):
@@ -30,6 +30,7 @@ def show(request, pk):
     return render_to_response('affiliates/show.html', {
         'affiliate': affiliate
     })
+
 
 @only_program_director
 def new(request):
@@ -61,10 +62,9 @@ def create(request):
     return redirect('affiliates:show', pk=affiliate.pk)
 
 
-@only_program_director
+@only_staff
 def edit(request, pk):
     affiliate = AffiliateEntity.objects.get(pk=pk)
-
 
     if request.method == 'POST':
         # delete image from POST since we pull it from FILES
@@ -87,11 +87,12 @@ def edit(request, pk):
         'affiliate': affiliate,
         'state_choices': STATE_CHOICES,
         'countries': countries,
-        'role_choices': AffiliateMembership.role_choices
+        'role_choices': AffiliateMembership.role_choices,
+        'is_program_director':request.user.is_staff or AffiliateMembership.objects.filter(member=request.user, affiliate_id=pk, role='staff').exists()
     })
 
 
-@only_program_director
+@only_staff
 def add_member(request, pk):
     member = get_student_from_identifier(request.POST.get('member_identifier'))
     params = {
@@ -105,7 +106,7 @@ def add_member(request, pk):
     return redirect('affiliates:edit', pk=pk)
 
 
-@only_program_director
+@only_staff
 def remove_member(request, pk, member_id):
     params = {
         'affiliate': AffiliateEntity.objects.get(pk=pk),

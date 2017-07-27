@@ -1,4 +1,4 @@
-import urllib2, cStringIO, File
+import urllib2, io
 from PIL import Image
 from django.core.files.base import ContentFile
 from django.core.management.base import BaseCommand, CommandError
@@ -32,14 +32,8 @@ class Command(BaseCommand):
 
             try:
                 if 's3' in image_url:
-                    # file = cStringIO.StringIO(urllib2.urlopen(image_url).read())
-                    # image_file = Image.open(file)
-                    img_data = urllib2.urlopen(image_url)
-
-                    image_file = NamedTemporaryFile(delete=True)
-                    image_file.write(img_data.content)
-                    image_file.flush()
-
+                    file_data = urllib2.urlopen(image_url).read()
+                    image_file = ContentFile(file_data)
                 else:
                     image_file = open(image_url)
             except IOError:
@@ -62,8 +56,7 @@ class Command(BaseCommand):
                 )
 
                 if image_file:
-                    affiliate.image.save(image_url.split('/')[-1], File(image_file), save=True)
-                    # affiliate.save()
+                    affiliate.image.save(image_url.split('/')[-1].split('?')[0], image_file, save=True)
 
                 AffiliateMembership.objects.get_or_create(
                     affiliate=affiliate,

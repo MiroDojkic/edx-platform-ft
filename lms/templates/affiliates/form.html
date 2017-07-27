@@ -51,112 +51,114 @@
     </table>
   </div>
 
+  % if is_program_director:
 
-  % if affiliate.pk:
-    <form class="edit-affiliate-container" action="/affiliates/edit/${affiliate.pk}" method="POST" enctype="multipart/form-data">
-  % else:
-    <form class="edit-affiliate-container" action="/affiliates/create" method="POST" enctype="multipart/form-data">
-  % endif
-
-    <br>
     % if affiliate.pk:
-      <h1 class="explore-header">Edit Affiliate Profile</h1>
+      <form class="edit-affiliate-container" action="/affiliates/edit/${affiliate.pk}" method="POST" enctype="multipart/form-data">
     % else:
-      <h1 class="explore-header">Create Affiliate</h1>
+      <form class="edit-affiliate-container" action="/affiliates/create" method="POST" enctype="multipart/form-data">
     % endif
 
-    <br>
-    <div>
-      <label for="">Public Contact Email</label>
       <br>
-      <input type="email" value="${affiliate.email}" name="email">
-    </div>
-    <br>
+      % if affiliate.pk:
+        <h1 class="explore-header">Edit Affiliate Profile</h1>
+      % else:
+        <h1 class="explore-header">Create Affiliate</h1>
+      % endif
 
-    <br>
-    <div>
-      <label for="">Profile Image</label>
-      <input class="upload-profile-image" type="file" name="image">
-    </div>
-    <br>
+      <br>
+      <div>
+        <label for="">Public Contact Email</label>
+        <br>
+        <input type="email" value="${affiliate.email}" name="email">
+      </div>
+      <br>
 
-    <br>
-    <div>
-      <label for="">Affiliate Organization</label>
       <br>
-      <input type="text" value="${affiliate.name}" name="name">
-    </div>
-    <br>
+      <div>
+        <label for="">Profile Image</label>
+        <input class="upload-profile-image" type="file" name="image">
+      </div>
+      <br>
 
-    <br>
-    <div>
-      <label for="">Address</label>
       <br>
-      <input type="text" value="${affiliate.address}" name="address">
-    </div>
-    <br>
+      <div>
+        <label for="">Affiliate Organization</label>
+        <br>
+        <input type="text" value="${affiliate.name}" name="name">
+      </div>
+      <br>
 
-    <br>
-    <div>
-      <label for="">City</label>
       <br>
-      <input type="text" value="${affiliate.city}" name="city">
-    </div>
-    <br>
+      <div>
+        <label for="">Address</label>
+        <br>
+        <input type="text" value="${affiliate.address}" name="address">
+      </div>
+      <br>
 
-    <br>
-    <div>
-      <label for="">State</label>
       <br>
+      <div>
+        <label for="">City</label>
+        <br>
+        <input type="text" value="${affiliate.city}" name="city">
+      </div>
       <br>
-      <select name="state">
-        % for choice in state_choices:
-          <option value="${choice[0]}" ${'selected' if affiliate.state == choice[0] else ''}>${choice[1]}</option>
-        % endfor
-      </select>
-    </div>
-    <br>
 
-    <br>
-    <div>
-      <label for="">Zip Code</label>
       <br>
-      <input type="text" value="${affiliate.zipcode}" name="zipcode">
-    </div>
-    <br>
+      <div>
+        <label for="">State</label>
+        <br>
+        <br>
+        <select name="state">
+          % for choice in state_choices:
+            <option value="${choice[0]}" ${'selected' if affiliate.state == choice[0] else ''}>${choice[1]}</option>
+          % endfor
+        </select>
+      </div>
+      <br>
 
-    <br>
-    <div>
-      <label for="">Country</label>
       <br>
+      <div>
+        <label for="">Zip Code</label>
+        <br>
+        <input type="text" value="${affiliate.zipcode}" name="zipcode">
+      </div>
       <br>
-      <select name="country">
-        % for country in countries:
-          <option value="${country[0]}" ${'selected' if affiliate.country == country[0] else ''}>${country[1]}</option>
-        % endfor
-      </select>
-    </div>
-    <br>
 
-    <br>
-    <div>
-      <label for="">Public Contact Phone Number</label>
       <br>
-      <input type="text" value="${affiliate.phone_number}" name="phone_number">
-    </div>
-    <br>
-
-    <br>
-    <div>
-      <label for="">Description</label>
+      <div>
+        <label for="">Country</label>
+        <br>
+        <br>
+        <select name="country">
+          % for country in countries:
+            <option value="${country[0]}" ${'selected' if affiliate.country == country[0] else ''}>${country[1]}</option>
+          % endfor
+        </select>
+      </div>
       <br>
-      <textarea name="description">${affiliate.description}</textarea>
-    </div>
-    <br>
 
-    <br>
-    <br>
-    <input type="hidden" name="csrfmiddlewaretoken" value="${csrf_token}" />
-    <input type="submit" value="Save" />
-  </div>
+      <br>
+      <div>
+        <label for="">Public Contact Phone Number</label>
+        <br>
+        <input type="text" value="${affiliate.phone_number}" name="phone_number">
+      </div>
+      <br>
+
+      <br>
+      <div>
+        <label for="">Description</label>
+        <br>
+        <textarea name="description">${affiliate.description}</textarea>
+      </div>
+      <br>
+
+      <br>
+      <br>
+      <input type="hidden" name="csrfmiddlewaretoken" value="${csrf_token}" />
+      <input type="submit" value="Save" />
+    </form>
+  % endif
 </section>
