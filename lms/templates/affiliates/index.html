@@ -17,21 +17,29 @@
     </div>
 
     <div class="sidebar-body">
-      <a href="affiliates" class="clear-all"> <span class="fa fa-remove"></span> Clear All</a>
-      <div class="sidebar-filter">
-        <div class="fa fa-user"></div>
-        <span class="filter-label">Affiliate Name</span>
-        <input type="text" id="affiliateName" placeholder="Search Affiliate" value="${affiliate_name}">
-      </div>
+      <form action="/affiliates/" method="POST">
+        <a href="/affiliates" class="clear-all"> <span class="fa fa-remove"></span> Clear All</a>
+        <div class="sidebar-filter">
+          <div class="fa fa-user"></div>
+          <span class="filter-label">Affiliate Name</span>
+          <input type="text" name="affiliate_name" placeholder="Search Affiliate" value="${affiliate_name}">
+        </div>
 
-      <div class="sidebar-filter">
-        <div class="fa fa-map-marker"></div>
-        <span class="filter-label">Location</span>
-        <input type="text" id="affiliateCity" placeholder="City" value="${affiliate_city}">
-        <input type="text" id="affiliateState" placeholder="State" value="${affiliate_state}">
-      </div>
+        <div class="sidebar-filter">
+          <div class="fa fa-map-marker"></div>
+          <span class="filter-label">Location</span>
+          <input type="text" name="affiliate_city" placeholder="City" value="${affiliate_city}">
+          <select name="affiliate_state">
+            <option selected disabled> state </option>
+            % for choice in state_choices:
+              <option value="${choice[0]}" ${ 'selected' if affiliate_state == choice[0] else '' }>${choice[1]}</option>
+            % endfor
+          </select>
+        </div>
 
-      <a href="#" id="submit-search" onclick="searchAffiliates()"> Submit <span class="fa fa-arrow-right"></span> </a>
+        <input type="hidden" name="csrfmiddlewaretoken" value="${csrf_token}" />
+        <button id="submit-search"> Submit <span class="fa fa-arrow-right"></span></button>
+      </form>
     </div>
   </div>
 

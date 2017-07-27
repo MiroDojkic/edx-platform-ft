@@ -10,17 +10,27 @@ from .decorators import only_program_director, only_staff
 
 # Create your views here.
 def index(request):
-    affiliate_name = request.POST.get('affiliate_name')
-    affiliate_city = request.POST.get('affiliate_city')
-    affiliate_state = request.POST.get('affiliate_state')
+    affiliate_name = request.POST.get('affiliate_name', '')
+    affiliate_city = request.POST.get('affiliate_city', '')
+    affiliate_state = request.POST.get('affiliate_state', '')
 
-    affiliates = AffiliateEntity.objects.all()
+    filters = {}
+    if affiliate_name:
+        filters['name__icontains'] = affiliate_name
+    if affiliate_city:
+        filters['city__icontains'] = affiliate_city
+    if affiliate_state:
+        filters['state'] = affiliate_state
+
+
+    affiliates = AffiliateEntity.objects.filter(**filters)
 
     return render_to_response('affiliates/index.html', {
         'affiliates': affiliates,
         'affiliate_name': affiliate_name,
         'affiliate_city': affiliate_city,
-        'affiliate_state': affiliate_state
+        'affiliate_state': affiliate_state,
+        'state_choices': STATE_CHOICES
     })
 
 
