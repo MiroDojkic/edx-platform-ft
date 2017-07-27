@@ -59,7 +59,8 @@ def create(request):
     # delete image from POST since we pull it from FILES
     request.POST.pop('image', None)
 
-    setattr(affiliate, 'image', request.FILES['image'])
+    if request.FILES and request.FILES['image']:
+        setattr(affiliate, 'image', request.FILES['image'])
 
     for key in request.POST:
         if key == 'year_of_birth':
