@@ -5,17 +5,19 @@ from .models import AffiliateMembership
 def only_program_director(function):
     """Only allow access to global staff or affiliate staff user(Program Director)"""
     @wraps(function)
-    def wrapped_view(request, pk=0, *args, **kwargs):
+    def wrapped_view(request, *args, **kwargs):
         """Wrapper for the view function."""
         if request.user.is_anonymous():
             return HttpResponseNotFound()
         elif request.user.is_staff:
-            return function(request, pk, *args, **kwargs)
+            return function(request, *args, **kwargs)
         else:
-            has_pd_role_in_affiliate = AffiliateMembership.objects.filter(member=request.user, affiliate_id=pk, role='staff').exists()
+            has_pd_role_in_affiliate = AffiliateMembership.objects.filter(member=request.user, affiliate_id=kwargs['pk'], role='staff').exists()
 
             if has_pd_role_in_affiliate:
-                return function(request, pk, *args, **kwargs)
+                return function(request, *args, **kwargs)
+            else:
+                return HttpResponseNotFound()
 
     return wrapped_view
 
@@ -23,17 +25,20 @@ def only_program_director(function):
 def only_staff(function):
     """Only allow access to global staff or affiliate staff user(Program Director)"""
     @wraps(function)
-    def wrapped_view(request, pk=0, *args, **kwargs):
+    def wrapped_view(request, *args, **kwargs):
         """Wrapper for the view function."""
         if request.user.is_anonymous():
             return HttpResponseNotFound()
         elif request.user.is_staff:
-            return function(request, pk, *args, **kwargs)
+            return function(request, *args, **kwargs)
         else:
-            has_pd_role_in_affiliate = AffiliateMembership.objects.filter(member=request.user, affiliate_id=pk, role='staff').exists()
-            has_cm_role_in_affiliate = AffiliateMembership.objects.filter(member=request.user, affiliate_id=pk, role='instructor').exists()
+            has_pd_role_in_affiliate = AffiliateMembership.objects.filter(member=request.user, affiliate_id=kwargs['pk'], role='staff').exists()
+            has_cm_role_in_affiliate = AffiliateMembership.objects.filter(member=request.user, affiliate_id=kwargs['pk'], role='instructor').exists()
 
             if has_pd_role_in_affiliate or has_cm_role_in_affiliate:
-                return function(request, pk, *args, **kwargs)
+                return function(request, *args, **kwargs)
+            else:
+                return HttpResponseNotFound()
+
 
     return wrapped_view
