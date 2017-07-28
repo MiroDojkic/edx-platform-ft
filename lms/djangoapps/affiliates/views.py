@@ -37,8 +37,6 @@ def index(request):
 def show(request, pk):
     affiliate = AffiliateEntity.objects.get(pk=pk)
 
-    import pdb; pdb.set_trace()
-
     return render_to_response('affiliates/show.html', {
         'affiliate': affiliate
     })
