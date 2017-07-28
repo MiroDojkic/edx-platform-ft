@@ -5,7 +5,7 @@ from .models import AffiliateMembership
 def only_program_director(function):
     """Only allow access to global staff or affiliate staff user(Program Director)"""
     @wraps(function)
-    def wrapped_view(request, pk, *args, **kwargs):
+    def wrapped_view(request, pk=0, *args, **kwargs):
         """Wrapper for the view function."""
         if request.user.is_anonymous():
             return HttpResponseNotFound()
@@ -23,7 +23,7 @@ def only_program_director(function):
 def only_staff(function):
     """Only allow access to global staff or affiliate staff user(Program Director)"""
     @wraps(function)
-    def wrapped_view(request, pk, *args, **kwargs):
+    def wrapped_view(request, pk=0, *args, **kwargs):
         """Wrapper for the view function."""
         if request.user.is_anonymous():
             return HttpResponseNotFound()
