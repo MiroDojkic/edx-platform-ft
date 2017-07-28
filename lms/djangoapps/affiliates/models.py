@@ -1,4 +1,4 @@
-from django.db import models
+from django.db import models, IntegrityError, transaction
 from django.db.models import Q, F
 from django.db.models.signals import post_save, post_delete
 from django.dispatch import receiver
@@ -67,46 +67,44 @@ class AffiliateMembership(models.Model):
 
 
 
-@contextmanager
-def ccx_course(ccx_locator):
-    """Create a context in which the course identified by course_locator exists
-    """
-    course = get_course_by_id(ccx_locator)
-    yield course
-
-
 @receiver(post_save, sender=AffiliateMembership, dispatch_uid="add_affiliate_course_enrollments")
 def add_affiliate_course_enrollments(sender, instance, **kwargs):
     'Allow staff or instructor access to affiliate member into all affiliate courses if they are staff or instructor member.'
     if not instance.role == 'ccx_coach':
         for ccx in instance.affiliate.courses:
             ccx_locator = CCXLocator.from_course_locator(ccx.course_id, ccx.id)
-            with ccx_course(ccx_locator) as course:
-                try:
+            course = get_course_by_id(ccx_locator)
+
+            try:
+                with transaction.atomic():
                     allow_access(course, instance.member, instance.role, False)
-                except:
-                    print 'Allow access failed.'
+            except IntegrityError:
+                print 'IntegrityError: Allow access failed.'
 
     # Program Director needs to be CCX coach on FastTrac course
     if instance.role == 'staff':
         course_id = CourseKey.from_string(settings.FASTTRAC_COURSE_KEY)
         course = get_course_by_id(course_id)
+
         try:
-            allow_access(course, instance.member, 'ccx_coach', False)
-        except:
-            print 'CCX coach failed.'
+            with transaction.atomic():
+                allow_access(course, instance.member, 'ccx_coach', False)
+        except IntegrityError:
+            print 'IntegrityError: CCX coach failed.'
+
 
 @receiver(post_delete, sender=AffiliateMembership, dispatch_uid="remove_affiliate_course_enrollments")
 def remove_affiliate_course_enrollments(sender, instance, **kwargs):
     'Remove all privileges over all affiliate courses.'
     for ccx in instance.affiliate.courses:
         ccx_locator = CCXLocator.from_course_locator(ccx.course_id, ccx.id)
+        course = get_course_by_id(ccx_locator)
 
-        with ccx_course(ccx_locator) as course:
-            revoke_access(course, instance.member, instance.role, False)
+        revoke_access(course, instance.member, instance.role, False)
 
     # Remove CCX coach on FastTrac course
     if instance.role == 'staff':
         course_id = CourseKey.from_string(settings.FASTTRAC_COURSE_KEY)
         course = get_course_by_id(course_id)
+
         revoke_access(course, instance.member, 'ccx_coach', False)
