@@ -19,7 +19,7 @@ class Command(BaseCommand):
     """
     def handle(self, *args, **options):
         course_id = CourseKey.from_string(settings.FASTTRAC_COURSE_KEY)
-        program_director_roles = CourseAccessRole.objects.filter(role='ccx_coach', course_id=course_id)
+        program_director_roles = CourseAccessRole.objects.filter(role='ccx_coach').exclude(course_id__startswith='ccx-')
 
         for program_director_role in program_director_roles:
             user = program_director_role.user

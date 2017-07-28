@@ -90,7 +90,7 @@
             <select name="coach_id">
               <option selected disabled> select affiliate </option>
               % for affiliate in affiliates:
-                <option value="${affiliate.id}" ${ 'selected' if filter_states.get('coach_id') == unicode(affiliate.id) else '' }>${affiliate.profile.name}</option>
+                <option value="${affiliate.pk}" ${ 'selected' if filter_states.get('coach_id') == unicode(affiliate.pk) else '' }>${affiliate.name}</option>
               % endfor
             </select>
           </li>
