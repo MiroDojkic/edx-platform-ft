@@ -57,19 +57,21 @@ def new(request):
 @only_program_director
 def create(request):
     affiliate = AffiliateEntity()
-    program_director_identifier = request.POST.pop('member_identifier', None)
+    post_data = request.POST.copy()
+
+    program_director_identifier = post_data.pop('member_identifier', None)[0]
 
     # delete image from POST since we pull it from FILES
-    request.POST.pop('image', None)
+    post_data.pop('image', None)
 
     if request.FILES and request.FILES['image']:
         setattr(affiliate, 'image', request.FILES['image'])
 
-    for key in request.POST:
+    for key in post_data:
         if key == 'year_of_birth':
-            setattr(affiliate, key, int(request.POST[key]))
+            setattr(affiliate, key, int(post_data[key]))
         else:
-            setattr(affiliate, key, request.POST[key])
+            setattr(affiliate, key, post_data[key])
 
     affiliate.save()
 
