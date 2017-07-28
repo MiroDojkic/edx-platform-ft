@@ -1,13 +1,14 @@
 <%namespace name='static' file='static_content.html'/>
 <%!
-from openedx.core.djangoapps.user_api.accounts.image_helpers import get_profile_image_urls_for_user
 from lms.djangoapps.ccx.models import CustomCourseForEdX
+from affiliates.models import AffiliateMembership
 %>
 
 <%page args="course" expression_filter="h"/>
 <%
   if hasattr(course.id, 'ccx'):
     ccx = CustomCourseForEdX.objects.get(pk=course.id.ccx)
+    affiliate = AffiliateMembership.find_by_user(ccx.coach).affiliate
   else:
     ccx = None
 %>
@@ -16,10 +17,7 @@ from lms.djangoapps.ccx.models import CustomCourseForEdX
     <a href="/courses/${course.id}/about">
         <header class="course-image">
             % if hasattr(course.id, 'ccx'):
-              <%
-                image_url = get_profile_image_urls_for_user(ccx.coach)['full']
-              %>
-              <img src="${image_url}" alt="${course.display_name}" />
+              <img src="${affiliate.image_url}" alt="${course.display_name}" />
             % else:
               <img src="${course.course_image_url}" alt="${course.display_name}" />
             % endif
@@ -37,7 +35,7 @@ from lms.djangoapps.ccx.models import CustomCourseForEdX
         <section class="course-info" aria-hidden="true">
             % if hasattr(course.id, 'ccx'):
               <h3 class="affiliate-name">
-                  ${ccx.coach.profile.affiliate_organization_name}
+                  ${affiliate.name}
               </h3>
             % endif
             <h2 class="course-name">

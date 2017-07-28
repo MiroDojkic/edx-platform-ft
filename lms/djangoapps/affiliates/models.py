@@ -65,6 +65,10 @@ class AffiliateMembership(models.Model):
     affiliate = models.ForeignKey(AffiliateEntity)
     role = models.CharField(choices=role_choices, max_length=255)
 
+    @classmethod
+    def find_by_user(self, user):
+        return self.objects.get(member=user)
+
 
 
 @receiver(post_save, sender=AffiliateMembership, dispatch_uid="add_affiliate_course_enrollments")

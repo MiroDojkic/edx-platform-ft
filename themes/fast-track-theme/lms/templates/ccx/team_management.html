@@ -10,7 +10,7 @@
     2. Confirm the email they registered with and enter it below. Then, use drop down to select role and click "Add"</div>
 <div class="table-wrapper">
     % if is_staff:
-        <a href="/affiliates/edit/${ccx.coach.username}">
+        <a href="/affiliates/edit/${affiliate_entity.pk}">
             <i class="fa fa-edit"></i>
             Edit Affiliate Info
         </a>
@@ -60,10 +60,7 @@
         <input type="hidden" name="csrfmiddlewaretoken" value="${csrf_token}">
         <input type="text" name="unique_student_identifier" />
         <input type="hidden" name="action" value="allow" />
-        <select name="rolename">
-            <option value="ccx_coach" selected>Facilitator</option>
-            <option value="instructor">Course Manager</option>
-        </select>
+        <input type="hidden" name="rolename" value="ccx_coach" />
         <button class="add-button" value="submit">Add</button>
     </form>
     <div id="error-modal" class="error hidden">

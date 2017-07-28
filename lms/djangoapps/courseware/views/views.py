@@ -101,6 +101,7 @@ from ccx.views import get_ccx_schedule
 from openedx.core.lib.xblock_utils import get_course_update_items
 from lms.envs.common import STATE_CHOICES
 from ccx_keys.locator import CCXLocator
+from affiliates.models import AffiliateEntity, AffiliateMembership
 
 
 log = logging.getLogger("edx.courseware")
@@ -161,7 +162,7 @@ def courses(request):
         "courseware/courses.html",
         {
             'courses': courses,
-            'affiliates': set([c.coach for c in ccxs]),
+            'affiliates': AffiliateEntity.objects.all(),
             'state_choices': STATE_CHOICES,
             'delivery_mode_choices': CustomCourseForEdX.DELIVERY_MODE_CHOICES,
             'filter_states': ccx_filters,

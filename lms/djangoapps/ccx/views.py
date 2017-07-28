@@ -49,6 +49,7 @@ from instructor.enrollment import (
 
 from lms.envs.common import STATE_CHOICES
 from lms.djangoapps.ccx.models import CustomCourseForEdX
+from affiliates.models import AffiliateMembership
 from lms.djangoapps.ccx.overrides import (
     get_override_for_ccx,
     override_field_for_ccx,
@@ -189,7 +190,8 @@ def dashboard(request, course, ccx=None):
         'enrollment_choices': CustomCourseForEdX.ENROLLMENT_TYPE_CHOICES,
         'is_instructor': False,
         'is_ccx_coach': False,
-        'is_staff': False
+        'is_staff': False,
+        'affiliate_entity': AffiliateMembership.find_by_user(ccx.coach).affiliate
     }
     context.update(get_ccx_creation_dict(course))
     if ccx:
