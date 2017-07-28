@@ -153,10 +153,11 @@ def courses(request):
 
     if should_hide_master_course:
         courses = CourseOverview.objects.filter(id__in=ccx_keys)
-    elif request.user.is_staff:
-        courses = CourseOverview.objects.filter(Q(id__in=ccx_keys) | ~Q(id__startswith='ccx'))
     else:
-        courses = CourseOverview.objects.filter(Q(id__in=ccx_keys) | ~Q(id__startswith='ccx')).filter(invitation_only=0)
+        courses = CourseOverview.objects.filter(Q(id__in=ccx_keys) | ~Q(id__startswith='ccx'))
+
+    if not request.user.is_staff:
+        courses = courses.filter(invitation_only=0)
 
     return render_to_response(
         "courseware/courses.html",
@@ -483,6 +484,28 @@ def bookmarks(request, course_id):
     }
 
     return render_to_response('courseware/bookmarks.html', context)
+
+@ensure_csrf_cookie
+@login_required
+@ensure_valid_course_key
+def messages(request, course_id):
+    course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+    course = get_course_by_id(course_key, depth=2)
+
+    location = course_key.make_usage_key('course_info', 'updates')
+    try:
+        course_updates = modulestore().get_item(location)
+    except ItemNotFoundError:
+        course_updates = modulestore().create_item(request.user.id, location.course_key, location.block_type, location.block_id)
+
+    messages = get_course_update_items(course_updates)
+
+    context = {
+        'messages': messages,
+        'course': course
+    }
+
+    return render_to_response('courseware/messages.html', context)
 
 @ensure_csrf_cookie
 @login_required

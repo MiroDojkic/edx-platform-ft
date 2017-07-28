@@ -304,7 +304,12 @@ $link-color: #6f6f6f;
       .affiliate-name {
         margin-left: 12px;
         margin-bottom: 8px;
+        padding-right: 8px;
         color: $ft-font-menu-color;
+
+        text-overflow: ellipsis;
+        overflow: hidden;
+        white-space: nowrap;
       }
 
       .course-name {
@@ -313,6 +318,9 @@ $link-color: #6f6f6f;
         letter-spacing: 0 !important;
         margin-left: 12px;
         text-transform: none;
+        text-overflow: ellipsis;
+        overflow: hidden;
+        white-space: nowrap;
       }
 
       .course-overview {
@@ -321,6 +329,21 @@ $link-color: #6f6f6f;
         font-weight: 400;
         letter-spacing: 0 !important;
         margin-left: 12px;
+        width: 95%;
+
+        span {
+          display: block;
+          display: -webkit-box;
+          max-width: 400px;
+          height: 35.84px;
+          margin: 0 auto;
+          font-size: 12.8px;
+          line-height: 1.4;
+          -webkit-line-clamp: 2;
+          -webkit-box-orient: vertical;
+          overflow: hidden;
+          text-overflow: ellipsis;
+        }
       }
     }
 
@@ -467,6 +490,36 @@ $link-color: #6f6f6f;
   }
 }
 
+.messages {
+  text-align: center;
+
+  & > * {
+    text-align: left;
+  }
+
+  h1 {
+    color: #aaa;
+    font-size: 4rem;
+    font-weight: bold;
+    font-style: italic;
+    width: 70%;
+    margin: 2rem auto;
+    text-transform: uppercase;
+  }
+
+  .message {
+    width: 70%;
+    margin: auto;
+    padding: 1rem;
+    border-bottom: 1px solid #ddd;
+  }
+
+  .message-date {
+    font-style: italic;
+    margin-bottom: 12px;
+  }
+}
+
 .header-facet {
   margin: 2rem 1rem 1rem;
   font-weight: bold;
@@ -569,45 +622,44 @@ $link-color: #6f6f6f;
   max-height: 200px;
 }
 
-// my courses page
-.dashboard .my-courses .course .details .enter-course {
+// buttons
+.dashboard .my-courses .course .details .enter-course,
+.login-register .register-form .register-button,
+.login-register .login-button,
+.login-register .nav-btn.form-toggle {
   background: $ft-orange;
   color: white;
   border: none;
+  box-shadow: none;
 
-  &:hover {
+  &:hover, &:active {
     background: $ft-orange;
     color: white;
     border: none;
     opacity: 0.7;
   }
+
+  &:focus {
+    outline: none;
+  }
 }
 
 // course about page
 .course-info header.course-profile .intro-inner-wrapper .intro .main-cta {
-  strong {
+  strong, a.register {
     background-color: $ft-orange;
     color: white;
     border: none;
 
-    &:hover:not(:disabled) {
+    &:hover:not(:disabled), &:active {
       background-color: $ft-orange;
       color: white;
       border: none;
       opacity: 0.7;
     }
-  }
 
-  a.register {
-    background-color: $ft-orange;
-    color: white;
-    border: none;
-
-    &:hover:not(:disabled) {
-      background-color: $ft-orange;
-      color: white;
-      border: none;
-      opacity: 0.7;
+    &:focus {
+      outline: none;
     }
   }
 }

@@ -16,7 +16,7 @@ from affiliates.models import AffiliateMembership
 <article class="course" role="region">
     <a href="/courses/${course.id}/about">
         <header class="course-image">
-            % if hasattr(course.id, 'ccx'):
+            % if ccx:
               <img src="${affiliate.image_url}" alt="${course.display_name}" />
             % else:
               <img src="${course.course_image_url}" alt="${course.display_name}" />
@@ -24,7 +24,7 @@ from affiliates.models import AffiliateMembership
             <div class="course-date-wrapper" aria-hidden="true">
                 <p class=course-date>
                   Start date:
-                  % if hasattr(course.id, 'ccx'):
+                  % if ccx:
                     ${ccx.time.strftime("%B %d, %Y")}
                   % else:
                     ${course.start.strftime("%B %d, %Y")}
@@ -33,18 +33,40 @@ from affiliates.models import AffiliateMembership
             </div>
         </header>
         <section class="course-info" aria-hidden="true">
-            % if hasattr(course.id, 'ccx'):
+            % if ccx:
+              % if len(ccx.coach.profile.affiliate_organization_name) > 28:
+              <h3 title="${ccx.coach.profile.affiliate_organization_name}" class="affiliate-name">
+                  ${ccx.coach.profile.affiliate_organization_name}
+              </h3>
+              % else:
               <h3 class="affiliate-name">
                   ${affiliate.name}
               </h3>
+              % endif
+              % if len(ccx.display_name) > 28:
+                <h2 title="${ccx.display_name}" class="course-name">
+                  ${ccx.display_name}
+                </h2>
+                % else:
+                <h2 class="course-name">
+                  ${ccx.display_name}
+                </h2>
+              % endif
+            % else:
+              % if len(course.display_name) > 25:
+                <h2 title="${course.display_name}" class="course-name">
+                    ${course.display_name}
+                </h2>
+                % else:
+                <h2 class="course-name">
+                  ${course.display_name}
+                </h2>
+              % endif
             % endif
-            <h2 class="course-name">
-                ${course.display_name}
-            </h2>
             <p class="course-overview">
-                % if hasattr(course.id, 'ccx'):
-                  % if len(ccx.course_description) > 100:
-                    <span>${ccx.course_description[:100] + '...'}</span>
+                % if ccx:
+                  % if len(ccx.course_description) > 120:
+                    <span title="${ccx.course_description}">${ccx.course_description[:120] + '...'}</span>
                   % else:
                       <span>${ccx.course_description}</span>
                   % endif
@@ -52,7 +74,7 @@ from affiliates.models import AffiliateMembership
             </p>
             <div class="course-footer">
                 <div class="course-delivery">
-                  % if hasattr(course.id, 'ccx') and ccx.delivery_mode == CustomCourseForEdX.IN_PERSON:
+                  % if ccx and ccx.delivery_mode == CustomCourseForEdX.IN_PERSON:
                       <i class="fa fa-users"></i>
                       In-Person
                   % else:
@@ -62,7 +84,7 @@ from affiliates.models import AffiliateMembership
                 </div>
                 <div class="course-state-wrapper">
                     <div class="course-state"><i class="fa fa-map-marker"></i>
-                      % if hasattr(course.id, 'ccx'):
+                      % if ccx:
                         ${ccx.location_state}
                       % else:
                         MO
