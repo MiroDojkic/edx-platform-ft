@@ -16,7 +16,7 @@ from affiliates.models import AffiliateMembership
     <a href="/courses/${course.id}/about">
         <header class="course-image">
             % if ccx:
-              <img src="${ccx.coach.profile.affiliate.image and ccx.coach.profile.affiliate.image.url}" alt="${course.display_name}" />
+              <img src="${ccx.image_url}" alt="${course.display_name}" />
             % else:
               <img src="${course.course_image_url}" alt="${course.display_name}" />
             % endif
@@ -34,7 +34,7 @@ from affiliates.models import AffiliateMembership
         <section class="course-info" aria-hidden="true">
             % if ccx:
               <h3 title="${ccx.coach.profile.affiliate.name}" class="affiliate-name">
-                  ${ccx.coach.profile.affiliate_organization_name}
+                  ${ccx.coach.profile.affiliate.name}
               </h3>
               % if len(ccx.display_name) > 28:
                 <h2 title="${ccx.display_name}" class="course-name">

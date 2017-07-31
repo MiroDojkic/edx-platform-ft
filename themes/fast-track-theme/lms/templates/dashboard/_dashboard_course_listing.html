@@ -19,7 +19,6 @@ from student.helpers import (
   VERIFY_STATUS_NEED_TO_REVERIFY,
   DISABLE_UNENROLL_CERT_STATES,
 )
-from openedx.core.djangoapps.user_api.accounts.image_helpers import get_profile_image_urls_for_user
 from lms.djangoapps.ccx.models import CustomCourseForEdX
 %>
 
@@ -79,9 +78,8 @@ from lms.djangoapps.ccx.models import CustomCourseForEdX
       % if hasattr(enrollment.course.id, 'ccx'):
         <%
           ccx_custom_course = CustomCourseForEdX.objects.get(pk=enrollment.course.id.ccx)
-          image_url = get_profile_image_urls_for_user(ccx_custom_course.coach)['full']
         %>
-        <a href="${course_target}" data-course-key="${enrollment.course_id}" class="cover" style="background-image: url(${image_url})"></a>
+        <a href="${course_target}" data-course-key="${enrollment.course_id}" class="cover" style="background-image: url(${ccx_custom_course.image_url})"></a>
       % elif show_courseware_link:
         % if not is_course_blocked:
             <a href="${course_target}" data-course-key="${enrollment.course_id}" class="cover">
@@ -140,7 +138,7 @@ from lms.djangoapps.ccx.models import CustomCourseForEdX
           </span>
           <span class="info-author">
             % if is_ccx:
-              ${ccx_custom_course.coach.profile.affiliate_organization_name}
+              ${ccx_custom_course.coach.profile.affiliate.name}
             % else:
               ${enrollment.author}
             % endif

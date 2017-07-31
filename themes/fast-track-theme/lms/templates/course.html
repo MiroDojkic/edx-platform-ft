@@ -4,7 +4,6 @@
 from django.utils.translation import ugettext as _
 from django.core.urlresolvers import reverse
 
-from openedx.core.djangoapps.user_api.accounts.image_helpers import get_profile_image_urls_for_user
 from lms.djangoapps.ccx.models import CustomCourseForEdX
 %>
 <%page args="course" expression_filter="h"/>
@@ -15,9 +14,8 @@ from lms.djangoapps.ccx.models import CustomCourseForEdX
         % if hasattr(course.id, 'ccx'):
           <%
             ccx_custom_course = CustomCourseForEdX.objects.get(pk=course.id.ccx)
-            image_url = get_profile_image_urls_for_user(ccx_custom_course.coach)['full']
           %>
-          <img src="${image_url}" alt="${course.display_name_with_default} ${course.display_number_with_default}" />
+          <img src="${ccx_custom_course.image_url}" alt="${course.display_name_with_default} ${course.display_number_with_default}" />
         % else:
           <img src="${course.course_image_url}" alt="${course.display_name_with_default} ${course.display_number_with_default}" />
         % endif
