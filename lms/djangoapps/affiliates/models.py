@@ -14,6 +14,8 @@ from contextlib import contextmanager
 from courseware.courses import get_course_with_access, get_course_by_id
 from opaque_keys.edx.keys import CourseKey
 from student.models import CourseAccessRole
+from django.template.defaultfilters import slugify
+from django.utils.crypto import get_random_string
 
 
 def user_directory_path(instance, filename):
@@ -21,6 +23,8 @@ def user_directory_path(instance, filename):
 
 
 class AffiliateEntity(models.Model):
+    slug = models.SlugField(max_length=255, unique=True, default='')
+
     email = models.CharField(max_length=255)
     name = models.CharField(max_length=255)
     description = models.CharField(null=True, blank=True, max_length=255, default='')
@@ -28,6 +32,7 @@ class AffiliateEntity(models.Model):
     address = models.CharField(null=True, blank=True, max_length=255, default='')
     city = models.CharField(null=True, blank=True, max_length=255, default='')
     zipcode = models.CharField(null=True, blank=True, max_length=255, default='')
+    website = models.CharField(null=True, blank=True, max_length=255, default='')
     facebook = models.CharField(null=True, blank=True, max_length=255, default='')
     twitter = models.CharField(null=True, blank=True, max_length=255, default='')
     linkedin = models.CharField(null=True, blank=True, max_length=255, default='')
@@ -37,6 +42,16 @@ class AffiliateEntity(models.Model):
     image = models.ImageField(upload_to=user_directory_path, null=True, blank=True)
 
     members = models.ManyToManyField(User, through='AffiliateMembership')
+
+    def save(self, *args, **kwargs):
+        slug = slugify(self.name)
+
+        if AffiliateEntity.objects.filter(slug=slug).exists():
+            self.slug = '-'.join([slug, get_random_string(4)])
+        else:
+            self.slug = slug
+
+        super(AffiliateEntity, self).save(*args, **kwargs)
 
     class Meta:
         unique_together = ('email', 'name')

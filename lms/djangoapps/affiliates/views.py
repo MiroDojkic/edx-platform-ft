@@ -34,8 +34,8 @@ def index(request):
     })
 
 
-def show(request, pk):
-    affiliate = AffiliateEntity.objects.get(pk=pk)
+def show(request, slug):
+    affiliate = AffiliateEntity.objects.get(slug=slug)
 
     return render_to_response('affiliates/show.html', {
         'affiliate': affiliate
@@ -78,12 +78,12 @@ def create(request):
         member = get_student_from_identifier(program_director_identifier)
         AffiliateMembership.objects.create(affiliate=affiliate, member=member, role='staff')
 
-    return redirect('affiliates:show', pk=affiliate.pk)
+    return redirect('affiliates:show', slug=affiliate.slug)
 
 
 @only_staff
-def edit(request, pk):
-    affiliate = AffiliateEntity.objects.get(pk=pk)
+def edit(request, slug):
+    affiliate = AffiliateEntity.objects.get(slug=slug)
 
     if request.method == 'POST':
         # delete image from POST since we pull it from FILES
@@ -100,7 +100,7 @@ def edit(request, pk):
 
         affiliate.save()
 
-        return redirect('affiliates:show', pk=affiliate.pk)
+        return redirect('affiliates:show', slug=affiliate.slug)
 
     return render_to_response('affiliates/form.html', {
         'affiliate': affiliate,
@@ -112,27 +112,27 @@ def edit(request, pk):
 
 
 @only_staff
-def add_member(request, pk):
+def add_member(request, slug):
     member = get_student_from_identifier(request.POST.get('member_identifier'))
     params = {
-        'affiliate': AffiliateEntity.objects.get(pk=pk),
+        'affiliate': AffiliateEntity.objects.get(slug=slug),
         'member': member,
         'role': request.POST.get('role'),
     }
 
     membership = AffiliateMembership.objects.create(**params)
 
-    return redirect('affiliates:edit', pk=pk)
+    return redirect('affiliates:edit', slug=slug)
 
 
 @only_staff
-def remove_member(request, pk, member_id):
+def remove_member(request, slug, member_id):
     params = {
-        'affiliate': AffiliateEntity.objects.get(pk=pk),
+        'affiliate': AffiliateEntity.objects.get(slug=slug),
         'member_id': member_id
     }
 
     AffiliateMembership.objects.filter(**params).delete()
 
-    return redirect('affiliates:edit', pk=pk)
+    return redirect('affiliates:edit', slug=slug)
 

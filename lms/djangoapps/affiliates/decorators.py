@@ -12,7 +12,7 @@ def only_program_director(function):
         elif request.user.is_staff:
             return function(request, *args, **kwargs)
         else:
-            has_pd_role_in_affiliate = AffiliateMembership.objects.filter(member=request.user, affiliate_id=kwargs['pk'], role='staff').exists()
+            has_pd_role_in_affiliate = AffiliateMembership.objects.filter(member=request.user, affiliate_id=kwargs['slug'], role='staff').exists()
 
             if has_pd_role_in_affiliate:
                 return function(request, *args, **kwargs)
@@ -32,8 +32,8 @@ def only_staff(function):
         elif request.user.is_staff:
             return function(request, *args, **kwargs)
         else:
-            has_pd_role_in_affiliate = AffiliateMembership.objects.filter(member=request.user, affiliate_id=kwargs['pk'], role='staff').exists()
-            has_cm_role_in_affiliate = AffiliateMembership.objects.filter(member=request.user, affiliate_id=kwargs['pk'], role='instructor').exists()
+            has_pd_role_in_affiliate = AffiliateMembership.objects.filter(member=request.user, affiliate_id=kwargs['slug'], role='staff').exists()
+            has_cm_role_in_affiliate = AffiliateMembership.objects.filter(member=request.user, affiliate_id=kwargs['slug'], role='instructor').exists()
 
             if has_pd_role_in_affiliate or has_cm_role_in_affiliate:
                 return function(request, *args, **kwargs)
