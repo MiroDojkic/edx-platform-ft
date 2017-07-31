@@ -24,7 +24,7 @@
         </section>
 
         <div class="media">
-          <div class="hero" style="background-image: url(${affiliate.image and affiliate.image.url})"></div>
+          <div class="hero" style="background-image: url(${affiliate.image_url})"></div>
         </div>
       </div>
     </div>
@@ -43,7 +43,7 @@
           <ul>
             % for course in affiliate.courses:
               <li class="affiliate-card">
-                <div class="image" style="background-image: url(${affiliate.image and affiliate.image.url});"></div>
+                <div class="image" style="background-image: url(${affiliate.image_url});"></div>
                 <div class="name">
                   ${course.display_name}
                 </div>

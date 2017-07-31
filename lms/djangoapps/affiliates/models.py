@@ -62,6 +62,13 @@ class AffiliateEntity(models.Model):
         return self.name
 
     @property
+    def image_url(self):
+        if self.image:
+            return self.image.url
+        else:
+            return 'https://s3.amazonaws.com/fasttrac-beta/default_full.png'
+
+    @property
     def memberships(self):
         return AffiliateMembership.objects.filter(affiliate=self)
 
