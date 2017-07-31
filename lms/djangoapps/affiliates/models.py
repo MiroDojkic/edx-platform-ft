@@ -110,11 +110,11 @@ def add_affiliate_course_enrollments(sender, instance, **kwargs):
                 print 'IntegrityError: Allow access failed.'
 
     # Program Director and Course Manager needs to be CCX coach on FastTrac course
-    course_overviews = CourseOverview.objects.exclude(course_id__startswith='ccx-')
+    course_overviews = CourseOverview.objects.exclude(id__startswith='ccx-')
 
     if instance.role == 'staff' or instance.role == 'instructor':
         for course_overview in course_overviews:
-            course_id = course_overview.course_id
+            course_id = course_overview.id
             course = get_course_by_id(course_id)
 
             try:
@@ -125,7 +125,7 @@ def add_affiliate_course_enrollments(sender, instance, **kwargs):
 
     elif instance.role == 'ccx_coach':
         for course_overview in course_overviews:
-            course_id = course_overview.course_id
+            course_id = course_overview.id
 
             enroll_email(course_id, instance.member.email, auto_enroll=True)
 
@@ -142,7 +142,7 @@ def remove_affiliate_course_enrollments(sender, instance, **kwargs):
 
     # Remove CCX coach on FastTrac course
     if instance.role == 'staff' or instance.role == 'instructor':
-        course_overviews = CourseOverview.objects.exclude(course_id__startswith='ccx-')
+        course_overviews = CourseOverview.objects.exclude(id__startswith='ccx-')
         for course_overview in course_overviews:
             course_id = course_overview.course_id
             course = get_course_by_id(course_id)
