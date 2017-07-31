@@ -16,6 +16,8 @@ from opaque_keys.edx.keys import CourseKey
 from student.models import CourseAccessRole
 from django.template.defaultfilters import slugify
 from django.utils.crypto import get_random_string
+from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
+from lms.djangoapps.instructor.enrollment import enroll_email
 
 
 def user_directory_path(instance, filename):
@@ -100,16 +102,26 @@ def add_affiliate_course_enrollments(sender, instance, **kwargs):
             except IntegrityError:
                 print 'IntegrityError: Allow access failed.'
 
-    # Program Director needs to be CCX coach on FastTrac course
-    if instance.role == 'staff':
-        course_id = CourseKey.from_string(settings.FASTTRAC_COURSE_KEY)
-        course = get_course_by_id(course_id)
+    # Program Director and Course Manager needs to be CCX coach on FastTrac course
+    course_overviews = CourseOverview.objects.exclude(course_id__startswith='ccx-')
 
-        try:
-            with transaction.atomic():
-                allow_access(course, instance.member, 'ccx_coach', False)
-        except IntegrityError:
-            print 'IntegrityError: CCX coach failed.'
+    if instance.role == 'staff' or instance.role == 'instructor':
+        for course_overview in course_overviews:
+            course_id = course_overview.course_id
+            course = get_course_by_id(course_id)
+
+            try:
+                with transaction.atomic():
+                    allow_access(course, instance.member, 'ccx_coach', False)
+            except IntegrityError:
+                print 'IntegrityError: CCX coach failed.'
+
+    elif instance.role == 'ccx_coach':
+        for course_overview in course_overviews:
+            course_id = course_overview.course_id
+
+            enroll_email(course_id, instance.member.email, auto_enroll=True)
+
 
 
 @receiver(post_delete, sender=AffiliateMembership, dispatch_uid="remove_affiliate_course_enrollments")
@@ -122,8 +134,10 @@ def remove_affiliate_course_enrollments(sender, instance, **kwargs):
         revoke_access(course, instance.member, instance.role, False)
 
     # Remove CCX coach on FastTrac course
-    if instance.role == 'staff':
-        course_id = CourseKey.from_string(settings.FASTTRAC_COURSE_KEY)
-        course = get_course_by_id(course_id)
+    if instance.role == 'staff' or instance.role == 'instructor':
+        course_overviews = CourseOverview.objects.exclude(course_id__startswith='ccx-')
+        for course_overview in course_overviews:
+            course_id = course_overview.course_id
+            course = get_course_by_id(course_id)
 
-        revoke_access(course, instance.member, 'ccx_coach', False)
+            revoke_access(course, instance.member, 'ccx_coach', False)
