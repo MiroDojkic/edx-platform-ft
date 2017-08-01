@@ -107,7 +107,7 @@ def edit(request, slug):
         'state_choices': STATE_CHOICES,
         'countries': countries,
         'role_choices': AffiliateMembership.role_choices,
-        'is_program_director':request.user.is_staff or AffiliateMembership.objects.filter(member=request.user, affiliate_id=pk, role='staff').exists()
+        'is_program_director':request.user.is_staff or AffiliateMembership.objects.filter(member=request.user, affiliate=affiliate, role='staff').exists()
     })
 
 
