@@ -85,6 +85,10 @@ class CustomCourseForEdX(models.Model):
         return self.coach.profile.affiliate
 
     @property
+    def ccx_course_id(self):
+        return CCXLocator.from_course_locator(self.course_id, self.id)
+
+    @property
     def image_url(self):
         if self.coach.profile.affiliate.image:
             return self.coach.profile.affiliate.image.url
