@@ -195,8 +195,9 @@ def dashboard(request, course, ccx=None):
         'is_instructor': False,
         'is_ccx_coach': False,
         'is_staff': False,
-        'affiliate_entity': AffiliateMembership.find_by_user(ccx.coach).affiliate
     }
+    if ccx:
+        context['affiliate_entity'] = AffiliateMembership.find_by_user(ccx.coach).affiliate
     context.update(get_ccx_creation_dict(course))
     if ccx:
         context.update(edit_ccx_context(course, ccx, request.user))
