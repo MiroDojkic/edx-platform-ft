@@ -81,6 +81,10 @@ class CustomCourseForEdX(models.Model):
         app_label = 'ccx'
 
     @property
+    def affiliate(self):
+        return self.coach.profile.affiliate
+
+    @property
     def image_url(self):
         if self.coach.profile.affiliate.image:
             return self.coach.profile.affiliate.image.url

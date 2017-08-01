@@ -57,6 +57,7 @@ from student.models import (
     DashboardConfiguration, LinkedInAddToProfileConfiguration, ManualEnrollmentAudit, ALLOWEDTOENROLL_TO_ENROLLED,
     LogoutViewConfiguration)
 from student.forms import AccountCreationForm, PasswordResetFormNoActive, get_registration_extension_form
+from affiliates.models import AffiliateMembership
 from lms.djangoapps.commerce.utils import EcommerceService  # pylint: disable=import-error
 from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification  # pylint: disable=import-error
 from lms.djangoapps.ccx.models import CustomCourseForEdX
@@ -588,6 +589,8 @@ def dashboard(request):
     # sort the enrollment pairs by the enrollment date
     course_enrollments.sort(key=lambda x: x.created, reverse=True)
 
+    affiliate_ids = AffiliateMembership.objects.select_related('affiliate').filter(member=request.user, role__in=['staff','instructor']).values_list('affiliate_id', flat=True)
+
     # set progress for each course
     # set author for each course
     for course_enrollment in course_enrollments:
@@ -741,6 +744,7 @@ def dashboard(request):
         redirect_message = ''
 
     context = {
+        'affiliate_ids': affiliate_ids,
         'enrollment_message': enrollment_message,
         'redirect_message': redirect_message,
         'course_enrollments': course_enrollments,
