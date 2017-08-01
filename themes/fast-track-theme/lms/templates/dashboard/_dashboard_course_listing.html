@@ -79,7 +79,7 @@ from lms.djangoapps.ccx.models import CustomCourseForEdX
         button_target = '/courses/{0}/ccx_coach'.format(enrollment.course_id)
         button_label = 'Create Custom Course'
       elif is_ccx and is_staff_or_instructor:
-        button_target = '/courses/{0}/edit_custom_course'.format(ccx_custom_course.id)
+        button_target = '/courses/{0}/edit_custom_course'.format(CCXLocator.from_course_locator(ccx_custom_course.course_id, unicode(ccx_custom_course.id)))
         button_label = 'Edit Course'
       else:
         button_target = course_target
@@ -119,7 +119,11 @@ from lms.djangoapps.ccx.models import CustomCourseForEdX
         <h3 class="course-title">
           % if show_courseware_link:
             % if not is_course_blocked:
-              <a data-course-key="${enrollment.course_id}" href="${course_target}">${course_overview.display_name_with_default}</a>
+              % if is_ccx:
+                <a data-course-key="${enrollment.course_id}" href="${course_target}">${ccx_custom_course.display_name}</a>
+              % else:
+                <a data-course-key="${enrollment.course_id}" href="${course_target}">${course_overview.display_name_with_default}</a>
+              % endif
             % else:
               <a class="disable-look" data-course-key="${enrollment.course_id}">${course_overview.display_name_with_default}</a>
             % endif

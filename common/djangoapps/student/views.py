@@ -132,6 +132,7 @@ from openedx.core.djangoapps.theming import helpers as theming_helpers
 
 from django_countries import countries
 from student.models import UserProfile
+from ccx_keys.locator import CCXLocator
 from openedx.core.djangoapps.user_api.accounts.image_helpers import get_profile_image_urls_for_user
 
 log = logging.getLogger("edx.student")
@@ -765,6 +766,7 @@ def dashboard(request):
         'block_courses': block_courses,
         'denied_banner': denied_banner,
         'billing_email': settings.PAYMENT_SUPPORT_EMAIL,
+        'CCXLocator': CCXLocator,
         'user': user,
         'logout_url': reverse('logout'),
         'platform_name': platform_name,
