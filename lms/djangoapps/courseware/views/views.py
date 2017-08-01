@@ -141,7 +141,15 @@ def courses(request):
     Render "find courses" page.
     """
     ccx_filters = build_ccx_filters(request)
-    ccxs = CustomCourseForEdX.objects.filter(**ccx_filters)
+
+    affiliate_id = request.POST.get('affiliate_id')
+
+    if affiliate_id:
+        affiliate = AffiliateEntity.objects.get(pk=affiliate_id)
+        ccxs = affiliate.courses.filter(**ccx_filters)
+    else:
+        ccxs = CustomCourseForEdX.objects.filter(**ccx_filters)
+
     ccx_keys = []
 
     for ccx in ccxs:
@@ -168,7 +176,8 @@ def courses(request):
             'delivery_mode_choices': CustomCourseForEdX.DELIVERY_MODE_CHOICES,
             'filter_states': ccx_filters,
             'date_from': request.POST.get('date_from', ''),
-            'date_to': request.POST.get('date_to', '')
+            'date_to': request.POST.get('date_to', ''),
+            'affiliate_id': affiliate_id
         }
     )
 
@@ -176,7 +185,7 @@ def get_should_hide_master_course(request):
     location_city = request.POST.get('location_city')
     location_state = request.POST.get('location_state')
     delivery_mode = request.POST.get('delivery_mode')
-    coach_id = request.POST.get('coach_id')
+    affiliate_id = request.POST.get('affiliate_id')
 
     # the master course needs to be hidden if
     # city isn't Kansas, state isn't Missouri
@@ -186,11 +195,11 @@ def get_should_hide_master_course(request):
     return ((location_city and not location_city.startswith('Kansas'))
         or (location_state and location_state != 'MO')
         or (delivery_mode and delivery_mode != CustomCourseForEdX.ONLINE_ONLY)
-        or coach_id)
+        or affiliate_id)
 
 
 def build_ccx_filters(request):
-    filter_fields = ['location_city', 'location_state', 'delivery_mode', 'coach_id']
+    filter_fields = ['location_city', 'location_state', 'delivery_mode']
     filters = {
         'id': F('original_ccx_id')
     }

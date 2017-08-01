@@ -87,10 +87,10 @@
         </h3>
         <ul class="facet-list">
           <li>
-            <select name="coach_id">
+            <select name="affiliate_id">
               <option selected disabled> select affiliate </option>
               % for affiliate in affiliates:
-                <option value="${affiliate.pk}" ${ 'selected' if filter_states.get('coach_id') == unicode(affiliate.pk) else '' }>${affiliate.name}</option>
+                <option value="${affiliate.pk}" ${ 'selected' if affiliate_id == unicode(affiliate.pk) else '' }>${affiliate.name}</option>
               % endfor
             </select>
           </li>
