@@ -55,9 +55,9 @@ def new(request):
 @only_program_director
 def create(request):
     affiliate = AffiliateEntity()
-    post_data = request.POST.copy()
+    post_data = request.POST.copy().dict()
 
-    program_director_identifier = post_data.pop('member_identifier', None)[0]
+    program_director_identifier = post_data.pop('member_identifier', None)
 
     # delete image from POST since we pull it from FILES
     post_data.pop('image', None)
