@@ -15,8 +15,10 @@ from openedx.core.lib.time_zone_utils import get_time_zone_abbr
 from xmodule_django.models import CourseKeyField, LocationKeyField
 from xmodule.error_module import ErrorDescriptor
 from xmodule.modulestore.django import modulestore
-from student.models import CourseAccessRole
+from student.models import CourseAccessRole, CourseEnrollment
+from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from ccx_keys.locator import CCXLocator
+from django.db import transaction
 
 
 log = logging.getLogger("edx.ccx")
@@ -79,6 +81,14 @@ class CustomCourseForEdX(models.Model):
 
     class Meta(object):
         app_label = 'ccx'
+
+    def delete(self):
+        with transaction.atomic():
+            CourseAccessRole.objects.filter(course_id=self.ccx_course_id).delete()
+            CourseOverview.objects.filter(id=self.ccx_course_id).delete()
+            CourseEnrollment.objects.filter(course_id=self.ccx_course_id).delete()
+
+            super(CustomCourseForEdX, self).delete()
 
     @property
     def affiliate(self):
@@ -204,7 +214,7 @@ class CcxFieldOverride(models.Model):
     """
     Field overrides for custom courses.
     """
-    ccx = models.ForeignKey(CustomCourseForEdX, db_index=True)
+    ccx = models.ForeignKey(CustomCourseForEdX, db_index=True, on_delete=models.CASCADE)
     location = LocationKeyField(max_length=255, db_index=True)
     field = models.CharField(max_length=255)
 

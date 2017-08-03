@@ -110,6 +110,12 @@ def edit(request, slug):
         'is_program_director':request.user.is_staff or AffiliateMembership.objects.filter(member=request.user, affiliate=affiliate, role='staff').exists()
     })
 
+@only_program_director
+def delete(request, slug):
+    AffiliateEntity.objects.get(slug=slug).delete()
+
+    return redirect('affiliates:index')
+
 
 @only_staff
 def add_member(request, slug):

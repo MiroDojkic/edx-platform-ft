@@ -690,3 +690,12 @@ def ccx_grades_csv(request, course, ccx=None):
         response['Content-Disposition'] = 'attachment'
 
         return response
+
+@ensure_csrf_cookie
+@cache_control(no_cache=True, no_store=True, must_revalidate=True)
+@coach_dashboard
+def delete_ccx(request, course, ccx=None):
+    if ccx:
+        ccx.delete()
+
+    return redirect('/dashboard')
