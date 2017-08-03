@@ -408,6 +408,12 @@ urlpatterns += (
         name='course_messages',
     ),
     url(
+        r'^courses/{}/updates'.format(
+            settings.COURSE_ID_PATTERN,
+        ),
+        include('course_updates.urls')
+    ),
+    url(
         r'^courses/{}/search$'.format(
             settings.COURSE_ID_PATTERN,
         ),
