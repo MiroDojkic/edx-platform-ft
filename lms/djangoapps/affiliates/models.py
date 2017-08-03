@@ -55,6 +55,12 @@ class AffiliateEntity(models.Model):
 
         super(AffiliateEntity, self).save(*args, **kwargs)
 
+
+    def delete(self):
+        with transaction.atomic():
+            self.courses.delete()
+            super(AffiliateEntity, self).delete()
+
     class Meta:
         unique_together = ('email', 'name')
 
@@ -86,7 +92,7 @@ class AffiliateMembership(models.Model):
     )
 
     member = models.ForeignKey(User)
-    affiliate = models.ForeignKey(AffiliateEntity)
+    affiliate = models.ForeignKey(AffiliateEntity, on_delete=models.CASCADE)
     role = models.CharField(choices=role_choices, max_length=255)
 
     @classmethod
@@ -144,7 +150,7 @@ def remove_affiliate_course_enrollments(sender, instance, **kwargs):
     if instance.role == 'staff' or instance.role == 'instructor':
         course_overviews = CourseOverview.objects.exclude(id__startswith='ccx-')
         for course_overview in course_overviews:
-            course_id = course_overview.course_id
+            course_id = course_overview.id
             course = get_course_by_id(course_id)
 
             revoke_access(course, instance.member, 'ccx_coach', False)
