@@ -180,10 +180,7 @@ def index(request, extra_context=None, user=AnonymousUser()):
     else:
         courses = sort_by_announcement(courses)
 
-    public_ccxs = CustomCourseForEdX.objects.raw('\
-        SELECT * FROM ccx_customcourseforedx\
-        WHERE id = original_ccx_id\
-        AND UPPER(enrollment_type) = "PUBLIC"')
+    public_ccxs = CustomCourseForEdX.objects.filter(enrollment_type=CustomCourseForEdX.PUBLIC)
 
     public_ccx_ids = [unicode(ccx.id) for ccx in public_ccxs]
 

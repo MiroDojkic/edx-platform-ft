@@ -29,7 +29,7 @@ from django.views.decorators.cache import cache_control
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.contrib.auth.models import User
 from student.models import CourseAccessRole
-from courseware.access import has_access
+from courseware.access import has_access, has_ccx_coach_role
 from courseware.courses import get_course_by_id
 
 from courseware.field_overrides import disable_overrides
@@ -108,14 +108,8 @@ def coach_dashboard(view):
         elif is_staff or is_instructor:
             return view(request, course, ccx)
         else:
-            role = CourseCcxCoachRole(course_key)
-            if not role.has_user(request.user):
-                return HttpResponseForbidden(_('You must be a CCX Coach to access this view.'))
-
-            # if there is a ccx, we must validate that it is the ccx for this coach
             if ccx is not None:
-                coach_ccx = get_ccx_by_ccx_id(course, request.user, ccx.original_ccx_id)
-                if not coach_ccx:
+                if not has_ccx_coach_role(request.user, course.id):
                     return HttpResponseForbidden(
                         _('You must be the coach for this ccx to access this view')
                     )
@@ -141,7 +135,7 @@ def edit_course_view(request, course, ccx):
 
 
 def edit_ccx_context(course, ccx, user):
-    ccx_locator = CCXLocator.from_course_locator(course.id, unicode(ccx.original_ccx_id))
+    ccx_locator = CCXLocator.from_course_locator(course.id, unicode(ccx.pk))
     assign_coach_role_to_ccx(ccx_locator, user, course.id)
 
     schedule = get_ccx_schedule(course, ccx)
@@ -201,7 +195,7 @@ def dashboard(request, course, ccx=None):
     context.update(get_ccx_creation_dict(course))
     if ccx:
         context.update(edit_ccx_context(course, ccx, request.user))
-        ccx_locator = CCXLocator.from_course_locator(course.id, unicode(ccx.original_ccx_id))
+        ccx_locator = CCXLocator.from_course_locator(course.id, unicode(ccx.pk))
         custom_courses = CustomCourseForEdX.objects.filter(course_id=ccx_locator)
 
         context['is_ccx_coach'] = ccx.coach == request.user
@@ -263,7 +257,7 @@ def edit_ccx(request, course, ccx=None):
     ccx.course_description = course_description
     ccx.save()
 
-    ccx_id = CCXLocator.from_course_locator(course.id, ccx.original_ccx_id)
+    ccx_id = CCXLocator.from_course_locator(course.id, ccx.pk)
 
     url = reverse('ccx_coach_dashboard', kwargs={'course_id': ccx_id})
     return redirect(url)
@@ -322,7 +316,6 @@ def create_ccx(request, course, ccx=None):
     ccx.save()
 
     # we need this for authorization
-    ccx.original_ccx_id = ccx.id
     ccx.save()
 
     # Make sure start/due are overridden for entire course
@@ -342,7 +335,7 @@ def create_ccx(request, course, ccx=None):
             for vertical in sequential.get_children():
                 override_field_for_ccx(ccx, vertical, hidden, True)
 
-    ccx_id = CCXLocator.from_course_locator(course.id, ccx.original_ccx_id)
+    ccx_id = CCXLocator.from_course_locator(course.id, ccx.pk)
 
     url = reverse('ccx_coach_dashboard', kwargs={'course_id': ccx_id})
 
@@ -473,7 +466,7 @@ def set_grading_policy(request, course, ccx=None):
 
     url = reverse(
         'ccx_coach_dashboard',
-        kwargs={'course_id': CCXLocator.from_course_locator(course.id, ccx.original_ccx_id)}
+        kwargs={'course_id': CCXLocator.from_course_locator(course.id, ccx.pk)}
     )
     return redirect(url)
 
@@ -574,7 +567,7 @@ def ccx_invite(request, course, ccx=None):
     identifiers_raw = request.POST.get('student-ids')
     identifiers = _split_input_list(identifiers_raw)
     email_students = 'email-students' in request.POST
-    course_key = CCXLocator.from_course_locator(course.id, ccx.original_ccx_id)
+    course_key = CCXLocator.from_course_locator(course.id, ccx.pk)
     email_params = get_email_params(course, auto_enroll=True, course_key=course_key, display_name=ccx.display_name)
 
     ccx_students_enrolling_center(action, identifiers, email_students, course_key, email_params, ccx.coach)
@@ -597,7 +590,7 @@ def ccx_student_management(request, course, ccx=None):
     student_id = request.POST.get('student-id', '')
     email_students = 'email-students' in request.POST
     identifiers = [student_id]
-    course_key = CCXLocator.from_course_locator(course.id, ccx.original_ccx_id)
+    course_key = CCXLocator.from_course_locator(course.id, ccx.pk)
     email_params = get_email_params(course, auto_enroll=True, course_key=course_key, display_name=ccx.display_name)
 
     errors = ccx_students_enrolling_center(action, identifiers, email_students, course_key, email_params, ccx.coach)
@@ -620,7 +613,7 @@ def ccx_gradebook(request, course, ccx=None):
     if not ccx:
         raise Http404
 
-    ccx_key = CCXLocator.from_course_locator(course.id, unicode(ccx.original_ccx_id))
+    ccx_key = CCXLocator.from_course_locator(course.id, unicode(ccx.pk))
     with ccx_course(ccx_key) as course:
         prep_course_for_grading(course, request)
         student_info, page = get_grade_book_page(request, course, course_key=ccx_key)
@@ -648,7 +641,7 @@ def ccx_grades_csv(request, course, ccx=None):
     if not ccx:
         raise Http404
 
-    ccx_key = CCXLocator.from_course_locator(course.id, ccx.original_ccx_id)
+    ccx_key = CCXLocator.from_course_locator(course.id, ccx.pk)
     with ccx_course(ccx_key) as course:
         prep_course_for_grading(course, request)
 

@@ -175,17 +175,12 @@ def get_ccx_by_ccx_id(course, coach, ccx_id):
     """
     try:
         if hasattr(course.id, 'ccx'):
-            ccx = CustomCourseForEdX.objects.get(
-                original_ccx_id=course.id.ccx,
-                coach=coach
-            )
-        else:
-            ccx = CustomCourseForEdX.objects.get(
-                # leave this commented out so we know what's up if things blow up in our face
-                # id=ccx_id,
-                coach=coach,
-                original_ccx_id=ccx_id
-            )
+            ccx_id = course.id.ccx
+
+        ccx = CustomCourseForEdX.objects.get(
+            pk=ccx_id,
+            coach=coach,
+        )
     except CustomCourseForEdX.DoesNotExist:
         return None
 

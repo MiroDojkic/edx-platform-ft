@@ -80,7 +80,7 @@ class AffiliateEntity(models.Model):
 
     @property
     def courses(self):
-        return CustomCourseForEdX.objects.filter(coach__in=self.members.all(), id=F('original_ccx_id'))
+        return CustomCourseForEdX.objects.filter(coach__in=self.members.all())
 
 
 
