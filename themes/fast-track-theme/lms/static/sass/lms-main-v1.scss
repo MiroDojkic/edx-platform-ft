@@ -704,7 +704,7 @@ label.u-field-title {
       margin: auto;
       padding: 1rem;
 
-      .date-picker-wrapper {
+      div.date-picker-wrapper {
         display: flex;
         flex-flow: row wrap;
         align-items: center;
@@ -712,6 +712,7 @@ label.u-field-title {
 
         label {
           display: inline-block;
+          margin-bottom: 0;
         }
 
         input {
