@@ -9,11 +9,11 @@ import logging
 import pytz
 import ast
 import requests
-
 from copy import deepcopy
 from cStringIO import StringIO
 
 from django.conf import settings
+from django.views.generic import ListView
 from django.core.urlresolvers import reverse
 from django.http import (
     Http404,
@@ -48,7 +48,7 @@ from instructor.enrollment import (
 )
 
 from lms.envs.common import STATE_CHOICES
-from lms.djangoapps.ccx.models import CustomCourseForEdX
+from lms.djangoapps.ccx.models import CustomCourseForEdX, CourseUpdates
 from lms.djangoapps.ccx.overrides import (
     get_override_for_ccx,
     override_field_for_ccx,
@@ -687,3 +687,7 @@ def ccx_grades_csv(request, course, ccx=None):
         response['Content-Disposition'] = 'attachment'
 
         return response
+
+class MessagesList(ListView):
+  model=CourseUpdates
+  template_name='course_updates/list.html'
