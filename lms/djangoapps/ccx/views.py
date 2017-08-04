@@ -687,3 +687,41 @@ def ccx_grades_csv(request, course, ccx=None):
         response['Content-Disposition'] = 'attachment'
 
         return response
+
+@transaction.non_atomic_requests
+@cache_control(no_cache=True, no_store=True, must_revalidate=True)
+@coach_dashboard
+def ccx_messages(request, course, ccx=None):
+    if not ccx:
+        raise Http404
+
+    messages = CourseUpdates.objects.filter(ccx=ccx)
+    ccx_id = unicode(CCXLocator.from_course_locator(course.id, unicode(ccx.id)))
+
+    context = {
+        'create_message_url': reverse('ccx_messages_create', kwargs={'course_id': ccx_id}),
+        'messages': messages,
+        'course': course
+    }
+
+    return render_to_response('ccx/ccx_messages_dashboard.html', context)
+
+@transaction.non_atomic_requests
+@coach_dashboard
+def ccx_messages_create(request, course, ccx=None):
+    if not ccx:
+        raise Http404
+
+    post_data = request.POST.copy().dict()
+
+    ccx_message = CourseUpdates(
+        date=post_data['date'],
+        content=post_data['content'],
+        author=request.user,
+        ccx=ccx
+    )
+    ccx_message.save()
+
+    ccx_id = unicode(CCXLocator.from_course_locator(course.id, unicode(ccx.id)))
+
+    return redirect(reverse('ccx_messages', kwargs={'course_id': ccx_id}))

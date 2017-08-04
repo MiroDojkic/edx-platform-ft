@@ -200,7 +200,10 @@ class CcxFieldOverride(models.Model):
     value = models.TextField(default='null')
 
 class CourseUpdates(models.Model):
-  date = models.DateField(blank=False, null=False)
-  content = models.TextField(blank=False, null=False)
-  author = models.ForeignKey(User)
-  ccx = models.ForeignKey(CustomCourseForEdX)
+    date = models.DateField(blank=False, null=False)
+    content = models.TextField(blank=False, null=False)
+    author = models.ForeignKey(User)
+    ccx = models.ForeignKey(CustomCourseForEdX)
+
+    def __getitem__(self, item):
+        return getattr(self, item)
