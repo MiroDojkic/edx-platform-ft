@@ -33,5 +33,4 @@ urlpatterns = patterns(
         'ccx.views.ccx_grades_csv', name='ccx_grades_csv'),
     url(r'^ccx_set_grading_policy$',
         'ccx.views.set_grading_policy', name='ccx_set_grading_policy'),
-    url(r'^ccx_messages$', views.MessagesList.as_view(), name='ccx_messages_list'),
 )

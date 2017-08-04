@@ -687,7 +687,3 @@ def ccx_grades_csv(request, course, ccx=None):
         response['Content-Disposition'] = 'attachment'
 
         return response
-
-class MessagesList(ListView):
-  model=CourseUpdates
-  template_name='course_updates/list.html'
