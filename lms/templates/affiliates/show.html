@@ -3,7 +3,7 @@
 <%inherit file="/main.html" />
 <%namespace name='static' file='/static_content.html'/>
 
-<%block name="pagetitle">Affiliate ${affiliate.name}</%block>
+<%block name="pagetitle">Affiliate Information - ${affiliate.name}</%block>
 
 <section class="course-info">
   <header class="course-profile">
@@ -32,6 +32,23 @@
 
   <div class="container">
     <div class="details">
+      % if is_program_director:
+        <a href="/affiliates/edit/${affiliate.slug}">
+          <i class="fa fa-pencil"></i>
+          Edit Affiliate Info
+        </a>
+        <br>
+        <br>
+      % endif
+
+      % if user.is_staff:
+        <a onclick="return confirm('This will delete ALL affiliate courses. This cannot be undone. Are you sure you want to delete ${affiliate.name}')" href="/affiliates/delete/${affiliate.slug}">
+          <i class="fa fa-ban"></i>
+          Delete Affiliate
+        </a>
+        <br>
+        <br>
+      % endif
 
       <div class="inner-wrapper">
         <h4>Description</h4>
@@ -95,6 +112,11 @@
           <li>
             <div class="fa fa-phone-square"></div>
             <a href="tel:${affiliate.phone_number}">${affiliate.phone_number}</a>
+          </li>
+
+          <li>
+            <div class="fa fa-globe"></div>
+            <a href="${affiliate.website}" target="_blank">${affiliate.website}</a>
           </li>
         </ul>
       </div>

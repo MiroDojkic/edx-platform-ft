@@ -297,7 +297,7 @@ h1.explore-header {
       text-align: left;
     }
 
-    input, select {
+    input, select, textarea {
       width: 100%;
       border: 0;
       outline: 0;
@@ -308,6 +308,10 @@ h1.explore-header {
       font-style: normal;
       background: transparent;
       color: #999;
+    }
+
+    textarea {
+      height: 8rem;
     }
 
     input:focus {

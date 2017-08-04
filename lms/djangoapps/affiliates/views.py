@@ -23,7 +23,7 @@ def index(request):
         filters['state'] = affiliate_state
 
 
-    affiliates = AffiliateEntity.objects.filter(**filters)
+    affiliates = AffiliateEntity.objects.filter(**filters).order_by('name')
 
     return render_to_response('affiliates/index.html', {
         'affiliates': affiliates,
@@ -38,7 +38,8 @@ def show(request, slug):
     affiliate = AffiliateEntity.objects.get(slug=slug)
 
     return render_to_response('affiliates/show.html', {
-        'affiliate': affiliate
+        'affiliate': affiliate,
+        'is_program_director': is_program_director(request.user, affiliate)
     })
 
 
@@ -107,7 +108,7 @@ def edit(request, slug):
         'state_choices': STATE_CHOICES,
         'countries': countries,
         'role_choices': AffiliateMembership.role_choices,
-        'is_program_director':request.user.is_staff or AffiliateMembership.objects.filter(member=request.user, affiliate=affiliate, role='staff').exists()
+        'is_program_director': is_program_director(request.user, affiliate)
     })
 
 @only_program_director
@@ -142,3 +143,9 @@ def remove_member(request, slug, member_id):
 
     return redirect('affiliates:edit', slug=slug)
 
+
+def is_program_director(user, affiliate):
+    if user.is_anonymous():
+        return False
+    else:
+        return user.is_staff or AffiliateMembership.objects.filter(member=user, affiliate=affiliate, role='staff').exists()
