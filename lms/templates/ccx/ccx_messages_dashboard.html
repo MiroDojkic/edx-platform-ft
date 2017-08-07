@@ -45,16 +45,17 @@ from openedx.core.djangolib.markup import HTML, Text
         <div style="font-style: italic;" class="message-date">Author: ${message['author'].username}</div>
         <div style="font-style: italic;" class="message-date">Date: ${message['date']}</div>
         <div class="message-content">${message['content']}</div>
+        <form action="${delete_message_url + str(message.id)}"><button>Delete</button></form>
       </div>
     % endfor
 
     <form action="${create_message_url}" class="add-message-form" method="POST">
       <input type="hidden" name="csrfmiddlewaretoken" value="${csrf_token}"/>
-      <textarea id="content" name="content" cols="120" rows="80">Message content...</textarea>
+      <textarea id="content" name="content" cols="120" rows="80" placeholder="Message content..."></textarea>
       <%!
         import datetime
 
-        datePlaceholder = "{0:%d}/{0:%m}/{0:%y}".format(datetime.datetime.date(datetime.datetime.now()))
+        datePlaceholder = "{0:%y}-{0:%m}-{0:%d}/".format(datetime.datetime.date(datetime.datetime.now()))
       %>
       <div class="date-picker-wrapper">
         <label for="date">Date:</label>
@@ -72,7 +73,7 @@ from openedx.core.djangolib.markup import HTML, Text
 
   <script>
     $(document).ready(function() {
-      $('.date').datepicker({'dateFormat': 'm/d/yy'});
+      $('.date').datepicker({'dateFormat': 'yy-mm-dd'});
     });
   </script>
 </main>
