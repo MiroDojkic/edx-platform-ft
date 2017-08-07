@@ -102,6 +102,7 @@ from openedx.core.lib.xblock_utils import get_course_update_items
 from lms.envs.common import STATE_CHOICES
 from ccx_keys.locator import CCXLocator
 from affiliates.models import AffiliateEntity, AffiliateMembership
+from affiliates.views import is_program_director
 
 
 log = logging.getLogger("edx.courseware")
@@ -874,11 +875,13 @@ def course_about(request, course_id):
             can_enroll = bool(has_access(request.user, 'enroll', course))
             invitation_only = course.invitation_only
             ccx = None
+            program_director = None
         else:
             ccx = CustomCourseForEdX.objects.get(pk=course.id.ccx)
             enrollment_allowed = ccx.enrollment_type.upper() == 'PUBLIC'
             can_enroll = enrollment_allowed
             invitation_only = not enrollment_allowed # invitation_only is a negation of enrollment_allowed
+            program_director = is_program_director(request.user, ccx.affiliate)
 
         is_course_full = CourseEnrollment.objects.is_course_full(course)
 
@@ -925,6 +928,7 @@ def course_about(request, course_id):
             'cart_link': reverse('shoppingcart.views.show_cart'),
             'pre_requisite_courses': pre_requisite_courses,
             'course_image_urls': overview.image_urls,
+            'is_program_director': program_director
         }
         inject_coursetalk_keys_into_context(context, course_key)
 

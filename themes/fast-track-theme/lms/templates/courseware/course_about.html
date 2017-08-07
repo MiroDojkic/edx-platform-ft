@@ -225,6 +225,12 @@ from affiliates.models import AffiliateMembership
 
       <div class="inner-wrapper">
         % if ccx:
+          % if is_program_director:
+            <a href="delete_ccx">
+              <i class="fa fa-times"></i>
+              Delete this course
+            </a>
+          % endif
           <pre>${ccx.course_description}</pre>
         % else:
           ${get_course_about_section(request, course, "overview")}
