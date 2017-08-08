@@ -196,20 +196,13 @@ def dashboard(request, course, ccx=None):
     if ccx:
         context.update(edit_ccx_context(course, ccx, request.user))
         ccx_locator = CCXLocator.from_course_locator(course.id, unicode(ccx.pk))
-        custom_courses = CustomCourseForEdX.objects.filter(course_id=ccx_locator)
 
         context['is_ccx_coach'] = ccx.coach == request.user
         context['is_instructor'] = ccx.is_instructor(request.user)
         context['is_staff'] = ccx.is_staff(request.user)
 
-        if not context['is_ccx_coach']:
-            for ccx_course in custom_courses:
-                if ccx_course.coach.id == request.user.id:
-                    context['is_ccx_coach'] = True
-                    context['is_instructor'] = ccx_course.is_instructor(request.user)
-                    context['is_staff'] = ccx_course.is_staff(request.user)
+        context['ccx_staff_permissions'] = CourseAccessRole.objects.filter(course_id=ccx_locator)
 
-        context['ccx_courses'] = custom_courses
         context['edit_current'] = False
 
         non_student_user_ids = CourseAccessRole.objects.filter(course_id=ccx_locator).values_list('user_id', flat=True)
