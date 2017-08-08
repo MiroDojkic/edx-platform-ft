@@ -203,7 +203,7 @@ class CourseUpdates(models.Model):
     date = models.DateField(blank=False, null=False)
     content = models.TextField(blank=False, null=False)
     author = models.ForeignKey(User)
-    ccx = models.ForeignKey(CustomCourseForEdX)
+    ccx = models.ForeignKey(CustomCourseForEdX, on_delete=models.CASCADE)
 
     def __getitem__(self, item):
         return getattr(self, item)

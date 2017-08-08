@@ -55,7 +55,7 @@ from openedx.core.djangolib.markup import HTML, Text
       <%!
         import datetime
 
-        datePlaceholder = "{0:%y}-{0:%m}-{0:%d}/".format(datetime.datetime.date(datetime.datetime.now()))
+        datePlaceholder = "{0:%Y}-{0:%m}-{0:%d}".format(datetime.datetime.date(datetime.datetime.now()))
       %>
       <div class="date-picker-wrapper">
         <label for="date">Date:</label>
