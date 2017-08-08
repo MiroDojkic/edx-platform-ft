@@ -2,7 +2,6 @@
 URLs for the CCX Feature.
 """
 from django.conf.urls import patterns, url
-from lms.djangoapps.ccx import views
 
 urlpatterns = patterns(
     '',

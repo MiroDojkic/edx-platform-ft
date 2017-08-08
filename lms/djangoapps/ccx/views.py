@@ -730,10 +730,7 @@ def ccx_messages_create(request, course, ccx=None, **kwargs):
 @transaction.non_atomic_requests
 @coach_dashboard
 def ccx_messages_delete(request, course, ccx=None, **kwargs):
-    if 'message_id' in kwargs:
-        message_id = kwargs.get('message_id')
-    else:
-        message_id = None
+    message_id = kwargs.get('message_id')
 
     if not ccx or not message_id:
         raise Http404
