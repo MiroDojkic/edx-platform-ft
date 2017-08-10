@@ -49,10 +49,13 @@
             <td>${membership.member.email}</td>
             <td>${membership.get_role_display()}</td>
             <td>
-              <a href="${affiliate.slug}/remove_member/${membership.member.id}">
-                <i class="fa fa-times"></i>
-                Remove
-              </a>
+              % if (membership.role == 'staff' and user.is_staff) or membership.role != 'staff':
+                <!-- only global staff can add/remove program directors -->
+                <a href="${affiliate.slug}/remove_member/${membership.member.id}?role=${membership.role}">
+                  <i class="fa fa-times"></i>
+                  Remove
+                </a>
+              % endif
             </td>
           </tr>
         % endfor

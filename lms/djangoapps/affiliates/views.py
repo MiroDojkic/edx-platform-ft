@@ -104,11 +104,19 @@ def edit(request, slug):
 
         return redirect('affiliates:show', slug=affiliate.slug)
 
+    role_choices = AffiliateMembership.role_choices
+
+    if not request.user.is_staff:
+        role_choices = (
+            ('ccx_coach', 'Facilitator'),
+            ('instructor', 'Course Manager'),
+        )
+
     return render_to_response('affiliates/form.html', {
         'affiliate': affiliate,
         'state_choices': STATE_CHOICES,
         'countries': countries,
-        'role_choices': AffiliateMembership.role_choices,
+        'role_choices': role_choices,
         'is_program_director': is_program_director(request.user, affiliate)
     })
 
@@ -122,6 +130,12 @@ def delete(request, slug):
 @only_staff
 def add_member(request, slug):
     member_identifier = request.POST.get('member_identifier')
+    role = request.POST.get('role')
+
+    if role == 'staff' and not request.user.is_staff:
+        messages.add_message(request, messages.INFO, 'You are not allowed to do that.')
+        return redirect('affiliates:edit', slug=slug)
+
     try:
         member = get_student_from_identifier(member_identifier)
     except ObjectDoesNotExist:
@@ -131,7 +145,7 @@ def add_member(request, slug):
     params = {
         'affiliate': AffiliateEntity.objects.get(slug=slug),
         'member': member,
-        'role': request.POST.get('role'),
+        'role': role,
     }
 
     membership = AffiliateMembership.objects.create(**params)
@@ -141,9 +155,16 @@ def add_member(request, slug):
 
 @only_staff
 def remove_member(request, slug, member_id):
+    role = request.GET.get('role')
+
+    if role == 'staff' and not request.user.is_staff:
+        messages.add_message(request, messages.INFO, 'You are not allowed to do that.')
+        return redirect('affiliates:edit', slug=slug)
+
     params = {
         'affiliate': AffiliateEntity.objects.get(slug=slug),
-        'member_id': member_id
+        'member_id': member_id,
+        'role': role
     }
 
     AffiliateMembership.objects.filter(**params).delete()
