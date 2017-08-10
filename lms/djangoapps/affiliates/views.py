@@ -1,3 +1,5 @@
+from django.core.exceptions import ObjectDoesNotExist
+from django.contrib import messages
 from django.shortcuts import render, redirect
 from django.http import Http404
 from lms.envs.common import STATE_CHOICES
@@ -119,7 +121,13 @@ def delete(request, slug):
 
 @only_staff
 def add_member(request, slug):
-    member = get_student_from_identifier(request.POST.get('member_identifier'))
+    member_identifier = request.POST.get('member_identifier')
+    try:
+        member = get_student_from_identifier(member_identifier)
+    except ObjectDoesNotExist:
+        messages.add_message(request, messages.INFO, 'User "{}" does not exist.'.format(member_identifier))
+        return redirect('affiliates:edit', slug=slug)
+
     params = {
         'affiliate': AffiliateEntity.objects.get(slug=slug),
         'member': member,
