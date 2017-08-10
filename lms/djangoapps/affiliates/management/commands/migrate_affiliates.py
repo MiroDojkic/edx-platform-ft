@@ -18,7 +18,6 @@ class Command(BaseCommand):
         Program Director is ccx_coach on master course.
     """
     def handle(self, *args, **options):
-        course_id = CourseKey.from_string(settings.FASTTRAC_COURSE_KEY)
         program_director_roles = CourseAccessRole.objects.filter(role='ccx_coach').exclude(course_id__startswith='ccx-')
 
         for program_director_role in program_director_roles:
