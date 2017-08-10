@@ -8,7 +8,6 @@ from django.contrib.auth.models import User
 from lms.djangoapps.instructor.views.tools import get_student_from_identifier
 from .decorators import only_program_director, only_staff
 
-# Create your views here.
 def index(request):
     affiliate_name = request.POST.get('affiliate_name', '')
     affiliate_city = request.POST.get('affiliate_city', '')

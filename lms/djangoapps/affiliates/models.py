@@ -48,7 +48,9 @@ class AffiliateEntity(models.Model):
     def save(self, *args, **kwargs):
         slug = slugify(self.name)
 
-        if AffiliateEntity.objects.filter(slug=slug).exclude(pk=self.pk).exists():
+        slug_exists = AffiliateEntity.objects.filter(slug=slug).exclude(pk=self.pk).exists()
+
+        if slug_exists:
             self.slug = '-'.join([slug, get_random_string(4)])
         else:
             self.slug = slug

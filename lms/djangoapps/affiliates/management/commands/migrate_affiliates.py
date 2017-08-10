@@ -35,6 +35,7 @@ class Command(BaseCommand):
                     file_data = urllib2.urlopen(image_url).read()
                     image_file = ContentFile(file_data)
                 else:
+                    # TODO: debug this and find path to profile images
                     image_file = open(image_url)
             except IOError:
                 self.stdout.write('Image not found')
@@ -56,7 +57,8 @@ class Command(BaseCommand):
                 )
 
                 if image_file:
-                    affiliate.image.save(image_url.split('/')[-1].split('?')[0], image_file, save=True)
+                    image_filename = image_url.split('/')[-1].split('?')[0]
+                    affiliate.image.save(image_filename, image_file, save=True)
 
                 AffiliateMembership.objects.get_or_create(
                     affiliate=affiliate,
