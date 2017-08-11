@@ -86,20 +86,24 @@ def coach_dashboard(view):
         """
         course_key = CourseKey.from_string(course_id)
         ccx = None
+
         if isinstance(course_key, CCXLocator):
             ccx_id = course_key.ccx
             try:
-                ccx = CustomCourseForEdX.objects.get(
-                    pk=ccx_id
-                )
+                ccx = CustomCourseForEdX.objects.get(pk=ccx_id)
             except CustomCourseForEdX.DoesNotExist:
                 raise Http404
 
-        # if ccx:
-        #     course_key = ccx.course_id
+        if ccx:
+            # get permissions for ccx course
+            course = get_course_by_id(course_key, depth=None)
+            is_staff = has_access(request.user, 'staff', course)
+            is_instructor = has_access(request.user, 'instructor', course)
+
+            # and then set course key to CCX master course
+            course_key = ccx.course_id
+
         course = get_course_by_id(course_key, depth=None)
-        is_staff = has_access(request.user, 'staff', course)
-        is_instructor = has_access(request.user, 'instructor', course)
 
         if not course.enable_ccx:
             raise Http404
@@ -522,7 +526,7 @@ def get_ccx_schedule(course, ccx):
                 yield visited
 
     with disable_overrides():
-        return tuple(visit(ccx.course))
+        return tuple(visit(course))
 
 
 @ensure_csrf_cookie
