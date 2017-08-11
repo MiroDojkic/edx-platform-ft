@@ -120,6 +120,8 @@ class UserReadOnlySerializer(serializers.Serializer):
         if profile.affiliate:
             visible_serialized_account["affiliate_slug"] = profile.affiliate.slug
 
+        visible_serialized_account["is_staff"] = user.is_staff
+
         return visible_serialized_account
 
     def _filter_fields(self, field_whitelist, serialized_account):
