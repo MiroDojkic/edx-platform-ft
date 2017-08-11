@@ -32,10 +32,11 @@ class Command(BaseCommand):
             try:
                 if 's3' in image_url:
                     file_data = urllib2.urlopen(image_url).read()
-                    image_file = ContentFile(file_data)
                 else:
-                    # TODO: debug this and find path to profile images
-                    image_file = open(image_url)
+                    image_path = '/edx/var/edxapp' + image_url.split('?')[0]
+                    file_data = open(image_path).read()
+
+                image_file = ContentFile(file_data)
             except IOError:
                 self.stdout.write('Image not found')
 
