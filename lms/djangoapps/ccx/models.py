@@ -7,7 +7,9 @@ import decimal
 from datetime import datetime
 
 from django.contrib.auth.models import User
-from django.db import models
+from django.db import models, transaction
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 from pytz import utc
 
 from lazy import lazy
@@ -18,7 +20,8 @@ from xmodule.modulestore.django import modulestore
 from student.models import CourseAccessRole, CourseEnrollment
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from ccx_keys.locator import CCXLocator
-from django.db import transaction
+from instructor.access import allow_access
+
 
 
 log = logging.getLogger("edx.ccx")
@@ -231,3 +234,17 @@ class CourseUpdates(models.Model):
 
     def __getitem__(self, item):
         return getattr(self, item)
+
+
+@receiver(post_save, sender=CustomCourseForEdX, dispatch_uid="add_affiliate_course_enrollments")
+def add_affiliate_course_enrollments(sender, instance, created, **kwargs):
+    'Allow all affiliate staff and instructors access to this course.'
+    # do this only for new CCX courses
+    if not created:
+        return
+
+    from courseware.courses import get_course_by_id
+
+    course = get_course_by_id(instance.ccx_course_id)
+    for membership in instance.affiliate.memberships.exclude(role='ccx_coach'):
+        allow_access(course, membership.member, membership.role, False)

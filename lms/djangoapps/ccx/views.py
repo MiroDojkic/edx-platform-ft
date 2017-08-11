@@ -58,8 +58,6 @@ from lms.djangoapps.ccx.overrides import (
 )
 from lms.djangoapps.ccx.utils import (
     add_master_course_staff_to_ccx,
-    assign_coach_role_to_ccx,
-    assign_staff_role_to_ccx,
     ccx_course,
     ccx_students_enrolling_center,
     get_ccx_by_ccx_id,
@@ -136,8 +134,6 @@ def edit_course_view(request, course, ccx, **kwargs):
 
 def edit_ccx_context(course, ccx, user, **kwargs):
     ccx_locator = CCXLocator.from_course_locator(course.id, unicode(ccx.pk))
-
-    assign_coach_role_to_ccx(ccx_locator, user, course.id)
 
     schedule = get_ccx_schedule(course, ccx)
     grading_policy = get_override_for_ccx(
@@ -342,9 +338,6 @@ def create_ccx(request, course, ccx=None, **kwargs):
         email_students=True,
         email_params=email_params,
     )
-
-    assign_coach_role_to_ccx(ccx_id, request.user, course.id)
-    assign_staff_role_to_ccx(ccx_id, request.user, course.id)
 
     return redirect(url)
 
@@ -686,8 +679,8 @@ def delete_ccx(request, course, ccx=None):
         ccx.delete()
 
     return redirect('/dashboard')
-  
-  
+
+
 @transaction.non_atomic_requests
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @coach_dashboard
