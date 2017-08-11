@@ -41,6 +41,8 @@ class AffiliateEntity(models.Model):
     state = models.CharField(null=True, blank=True, default='na', choices=STATE_CHOICES, max_length=255)
     country = CountryField(blank=True, null=True)
 
+    geoposition_x = models.IntegerField(null=True, blank=True)
+    geoposition_y = models.IntegerField(null=True, blank=True)
     image = models.ImageField(upload_to=user_directory_path, null=True, blank=True)
 
     members = models.ManyToManyField(User, through='AffiliateMembership')
