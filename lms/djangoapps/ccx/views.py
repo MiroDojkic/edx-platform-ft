@@ -522,7 +522,7 @@ def get_ccx_schedule(course, ccx):
                 yield visited
 
     with disable_overrides():
-        return tuple(visit(course))
+        return tuple(visit(ccx.course))
 
 
 @ensure_csrf_cookie
