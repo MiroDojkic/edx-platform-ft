@@ -431,7 +431,7 @@ def course_info(request, course_id):
 
         # ccx can only have subset of sections, so show only ones included in ccx schedule
         if hasattr(course.id, 'ccx'):
-            schedule = get_ccx_schedule(course, course.id.ccx)
+            schedule = get_ccx_schedule(course, ccx)
             ccx_chapter_locations = [s['location'] for s in schedule]
             sections = [s for s in sections if unicode(s.location) in ccx_chapter_locations]
 
