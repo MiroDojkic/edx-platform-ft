@@ -58,7 +58,7 @@
         <h4>Affiliate Courses</h4>
         <div class="affiliate-courses">
           <ul>
-            % for course in affiliate.courses:
+            % for course in affiliate.courses.filter(enrollment_type='PUBLIC'):
               <li class="affiliate-card">
                 <div class="image" style="background-image: url(${affiliate.image_url});"></div>
                 <div class="name">
