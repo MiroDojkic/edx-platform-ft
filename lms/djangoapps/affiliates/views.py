@@ -5,6 +5,8 @@ from django.http import Http404
 from lms.envs.common import STATE_CHOICES
 from django_countries import countries
 from edxmako.shortcuts import render_to_response, render_to_string
+import requests
+
 from .models import AffiliateEntity, AffiliateMembership
 from django.contrib.auth.models import User
 from lms.djangoapps.instructor.views.tools import get_student_from_identifier
@@ -75,6 +77,13 @@ def create(request):
 
     affiliate.save()
 
+    x, y = get_affiliate_coordinates(affiliate)
+    import pdb; pdb.set_trace()
+    setattr(affiliate, 'geoposition_x', x)
+    setattr(affiliate, 'geoposition_y', y)
+    import pdb; pdb.set_trace()
+    affiliate.save()
+
     # SurveyGizmo functionality to automatically add Program Director upon creation
     if program_director_identifier:
         member = get_student_from_identifier(program_director_identifier)
@@ -82,6 +91,19 @@ def create(request):
 
     return redirect('affiliates:show', slug=affiliate.slug)
 
+def get_affiliate_coordinates(affiliate):
+    geocoding_api_key = 'AIzaSyA-UurpXpJGi3WsR7G0ZRNWSpodrIxSt9U'
+    params = affiliate.address + ',' + affiliate.zipcode + ',' + affiliate.city
+    if affiliate.state != 'NA':
+        params = params + ',' + affiliate.state
+
+    url = 'https://maps.googleapis.com/maps/api/geocode/json?address=' + params + ',&key=' + geocoding_api_key
+    r = requests.get(url)
+    response = r.json()
+
+    location = response['results'][0]['geometry']['location']
+
+    return location['lat'], location['lng']
 
 @only_staff
 def edit(request, slug):
