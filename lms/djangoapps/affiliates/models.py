@@ -92,7 +92,7 @@ class AffiliateEntity(models.Model):
         url = 'https://maps.googleapis.com/maps/api/geocode/json?address=' + params + ',&key=' + geocoding_api_key
         json_response = requests.get(url).json()
 
-        if len(json_response['results']) < 1:
+        if len(json_response['results']) == 0:
             return None, None
 
         location = json_response['results'][0]['geometry']['location']
