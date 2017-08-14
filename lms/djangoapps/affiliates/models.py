@@ -19,6 +19,7 @@ from django.utils.crypto import get_random_string
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from lms.djangoapps.instructor.enrollment import enroll_email
 from .helpers import get_affiliate_coordinates, build_geocoding_info
+import requests
 
 
 def user_directory_path(instance, filename):
@@ -42,17 +43,17 @@ class AffiliateEntity(models.Model):
     state = models.CharField(null=True, blank=True, default='na', choices=STATE_CHOICES, max_length=255)
     country = CountryField(blank=True, null=True)
 
-    position_latitude = models.FloatField(null=True, blank=True)
-    position_longitude = models.FloatField(null=True, blank=True)
+    location_latitude = models.FloatField(null=True, blank=True)
+    location_longitude = models.FloatField(null=True, blank=True)
     image = models.ImageField(upload_to=user_directory_path, null=True, blank=True)
 
     members = models.ManyToManyField(User, through='AffiliateMembership')
 
-    __geocoding_info = None
+    __full_address = None
 
     def __init__(self, *args, **kwargs):
         super(AffiliateEntity, self).__init__(*args, **kwargs)
-        self.__geocoding_info = build_geocoding_info(self)
+        self.__full_address = self.build_full_address()
 
     def save(self, *args, **kwargs):
         slug = slugify(self.name)
@@ -64,21 +65,40 @@ class AffiliateEntity(models.Model):
         else:
             self.slug = slug
 
-        new_geocoding_info = build_geocoding_info(self)
+        new_full_address = self.build_full_address()
 
-        if self.__geocoding_info != new_geocoding_info:
-            latitude, longitude = get_affiliate_coordinates(self)
-            setattr(self, 'position_latitude', latitude)
-            setattr(self, 'position_longitude', longitude)
+        if self.__full_address != new_full_address:
+            latitude, longitude = self.get_location_coordinates()
+            setattr(self, 'location_latitude', latitude)
+            setattr(self, 'location_longitude', longitude)
 
         super(AffiliateEntity, self).save(*args, **kwargs)
-        self.__geocoding_info = new_geocoding_info
-
+        self.__full_address = new_full_address
 
     def delete(self):
         with transaction.atomic():
             self.courses.delete()
             super(AffiliateEntity, self).delete()
+
+    def build_full_address(self):
+        return self.address + ',' + self.zipcode + ',' + self.city
+
+    def get_location_coordinates(self):
+        geocoding_api_key = settings.GEOCODING_API_KEY
+        params = self.build_full_address()
+        if self.state != 'NA':
+            params = params + ',' + self.state
+
+        url = 'https://maps.googleapis.com/maps/api/geocode/json?address=' + params + ',&key=' + geocoding_api_key
+        json_response = requests.get(url).json()
+
+        if len(json_response['results']) < 1:
+            return None, None
+
+        location = json_response['results'][0]['geometry']['location']
+
+        return location['lat'], location['lng']
+
 
     class Meta:
         unique_together = ('email', 'name')
