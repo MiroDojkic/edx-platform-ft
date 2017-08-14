@@ -18,6 +18,8 @@ from django.template.defaultfilters import slugify
 from django.utils.crypto import get_random_string
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from lms.djangoapps.instructor.enrollment import enroll_email
+from .helpers import get_affiliate_coordinates, build_geocoding_info
+import requests
 
 
 def user_directory_path(instance, filename):
@@ -41,9 +43,17 @@ class AffiliateEntity(models.Model):
     state = models.CharField(null=True, blank=True, default='na', choices=STATE_CHOICES, max_length=255)
     country = CountryField(blank=True, null=True)
 
+    location_latitude = models.FloatField(null=True, blank=True)
+    location_longitude = models.FloatField(null=True, blank=True)
     image = models.ImageField(upload_to=user_directory_path, null=True, blank=True)
 
     members = models.ManyToManyField(User, through='AffiliateMembership')
+
+    __full_address = None
+
+    def __init__(self, *args, **kwargs):
+        super(AffiliateEntity, self).__init__(*args, **kwargs)
+        self.__full_address = self.build_full_address()
 
     def save(self, *args, **kwargs):
         slug = slugify(self.name)
@@ -55,13 +65,40 @@ class AffiliateEntity(models.Model):
         else:
             self.slug = slug
 
-        super(AffiliateEntity, self).save(*args, **kwargs)
+        new_full_address = self.build_full_address()
 
+        if self.__full_address != new_full_address:
+            latitude, longitude = self.get_location_coordinates()
+            setattr(self, 'location_latitude', latitude)
+            setattr(self, 'location_longitude', longitude)
+
+        super(AffiliateEntity, self).save(*args, **kwargs)
+        self.__full_address = new_full_address
 
     def delete(self):
         with transaction.atomic():
             self.courses.delete()
             super(AffiliateEntity, self).delete()
+
+    def build_full_address(self):
+        return self.address + ',' + self.zipcode + ',' + self.city
+
+    def get_location_coordinates(self):
+        geocoding_api_key = settings.GEOCODING_API_KEY
+        params = self.build_full_address()
+        if self.state != 'NA':
+            params = params + ',' + self.state
+
+        url = 'https://maps.googleapis.com/maps/api/geocode/json?address=' + params + ',&key=' + geocoding_api_key
+        json_response = requests.get(url).json()
+
+        if len(json_response['results']) < 1:
+            return None, None
+
+        location = json_response['results'][0]['geometry']['location']
+
+        return location['lat'], location['lng']
+
 
     class Meta:
         unique_together = ('email', 'name')

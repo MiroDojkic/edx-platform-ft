@@ -5,6 +5,7 @@ from django.http import Http404
 from lms.envs.common import STATE_CHOICES
 from django_countries import countries
 from edxmako.shortcuts import render_to_response, render_to_string
+
 from .models import AffiliateEntity, AffiliateMembership
 from django.contrib.auth.models import User
 from lms.djangoapps.instructor.views.tools import get_student_from_identifier
@@ -22,7 +23,6 @@ def index(request):
         filters['city__icontains'] = affiliate_city
     if affiliate_state:
         filters['state'] = affiliate_state
-
 
     affiliates = AffiliateEntity.objects.filter(**filters).order_by('name')
 
@@ -81,7 +81,6 @@ def create(request):
         AffiliateMembership.objects.create(affiliate=affiliate, member=member, role='staff')
 
     return redirect('affiliates:show', slug=affiliate.slug)
-
 
 @only_staff
 def edit(request, slug):
