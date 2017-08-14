@@ -3,7 +3,7 @@ import requests
 
 def get_affiliate_coordinates(affiliate):
     geocoding_api_key = settings.GEOCODING_API_KEY
-    params = affiliate.address + ',' + affiliate.zipcode + ',' + affiliate.city
+    params = build_geocoding_info(affiliate)
     if affiliate.state != 'NA':
         params = params + ',' + affiliate.state
 
@@ -16,3 +16,6 @@ def get_affiliate_coordinates(affiliate):
     location = json_response['results'][0]['geometry']['location']
 
     return location['lat'], location['lng']
+
+def build_geocoding_info(affiliate):
+    return affiliate.address + ',' + affiliate.zipcode + ',' + affiliate.city

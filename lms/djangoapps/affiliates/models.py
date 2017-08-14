@@ -18,6 +18,7 @@ from django.template.defaultfilters import slugify
 from django.utils.crypto import get_random_string
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from lms.djangoapps.instructor.enrollment import enroll_email
+from .helpers import get_affiliate_coordinates, build_geocoding_info
 
 
 def user_directory_path(instance, filename):
@@ -47,6 +48,12 @@ class AffiliateEntity(models.Model):
 
     members = models.ManyToManyField(User, through='AffiliateMembership')
 
+    __geocoding_info = None
+
+    def __init__(self, *args, **kwargs):
+        super(AffiliateEntity, self).__init__(*args, **kwargs)
+        self.__geocoding_info = build_geocoding_info(self)
+
     def save(self, *args, **kwargs):
         slug = slugify(self.name)
 
@@ -57,7 +64,15 @@ class AffiliateEntity(models.Model):
         else:
             self.slug = slug
 
+        new_geocoding_info = build_geocoding_info(self)
+
+        if self.__geocoding_info != new_geocoding_info:
+            latitude, longitude = get_affiliate_coordinates(self)
+            setattr(self, 'position_latitude', latitude)
+            setattr(self, 'position_longitude', longitude)
+
         super(AffiliateEntity, self).save(*args, **kwargs)
+        self.__geocoding_info = new_geocoding_info
 
 
     def delete(self):

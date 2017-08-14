@@ -10,7 +10,6 @@ from .models import AffiliateEntity, AffiliateMembership
 from django.contrib.auth.models import User
 from lms.djangoapps.instructor.views.tools import get_student_from_identifier
 from .decorators import only_program_director, only_staff
-from .helpers import get_affiliate_coordinates
 
 def index(request):
     affiliate_name = request.POST.get('affiliate_name', '')
@@ -73,12 +72,6 @@ def create(request):
             setattr(affiliate, key, int(post_data[key]))
         else:
             setattr(affiliate, key, post_data[key])
-
-    affiliate.save()
-
-    latitude, longitude = get_affiliate_coordinates(affiliate)
-    setattr(affiliate, 'position_latitude', latitude)
-    setattr(affiliate, 'position_longitude', longitude)
 
     affiliate.save()
 
