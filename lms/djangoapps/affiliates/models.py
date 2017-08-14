@@ -18,7 +18,6 @@ from django.template.defaultfilters import slugify
 from django.utils.crypto import get_random_string
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from lms.djangoapps.instructor.enrollment import enroll_email
-from .helpers import get_affiliate_coordinates, build_geocoding_info
 import requests
 
 
