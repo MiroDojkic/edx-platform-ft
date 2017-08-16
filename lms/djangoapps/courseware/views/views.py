@@ -33,6 +33,7 @@ from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey, UsageKey
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from rest_framework import status
+import requests
 from instructor.views.api import require_global_staff
 
 import shoppingcart
@@ -200,7 +201,7 @@ def get_should_hide_master_course(request):
 
 
 def build_ccx_filters(request):
-    filter_fields = ['location_city', 'location_state', 'delivery_mode']
+    filter_fields = ['location_city', 'delivery_mode']
     filters = {}
 
     if not request.user.is_staff:
@@ -213,6 +214,41 @@ def build_ccx_filters(request):
 
     date_from = request.POST.get('date_from')
     date_to = request.POST.get('date_to')
+
+    location_zipcode = request.POST.get('location_zipcode')
+    location_state = request.POST.get('location_state')
+
+    latitude = None
+    longitude = None
+    if location_zipcode:
+        geocoding_api_key = settings.GEOCODING_API_KEY
+        url = 'https://maps.googleapis.com/maps/api/geocode/json?address=' + location_zipcode + '+' + location_state + ',&key=' + geocoding_api_key
+        json_response = requests.get(url).json()
+
+        if len(json_response['results']) > 0:
+            location = json_response['results'][0]['geometry']['location']
+            latitude = location['lat']
+            longitude = location['lng']
+
+    if latitude and longitude:
+        latitude_max = latitude + 2
+        longitude_max = longitude + 2
+        latitude_min = latitude - 2
+        longitude_min = longitude - 2
+
+        nearby_affiliates = AffiliateEntity.objects.filter(
+            location_latitude__gte=latitude_min,
+            location_latitude__lte=latitude_max,
+            location_longitude__gte=longitude_min,
+            location_longitude__lte=longitude_max
+        )
+        members = []
+
+        for affiliate in nearby_affiliates:
+            for membership in affiliate.memberships:
+                members.append(membership.member)
+
+        filters['coach__in'] = members
 
     if date_from:
         filters['time__gte'] = datetime.strptime(date_from, '%m/%d/%Y')
