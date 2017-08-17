@@ -273,8 +273,9 @@ def get_coordinate_boundaries(latitude, longitude):
     Returns boundaries around the given coordinates (latitude, longitude),
     inside which affiliate location is searched for.
     """
-    latitude_boundaries = (latitude - 2, latitude + 2)
-    longitude_boundaries = (longitude - 2, longitude + 2)
+    search_radius = 2
+    latitude_boundaries = (latitude - search_radius, latitude + search_radius)
+    longitude_boundaries = (longitude - search_radius, longitude + search_radius)
 
     return (latitude_boundaries, longitude_boundaries)
 
