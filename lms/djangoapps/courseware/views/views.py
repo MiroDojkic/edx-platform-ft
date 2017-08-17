@@ -254,7 +254,7 @@ def get_affiliate_location_filter(zipcode):
         longitude = location['lng']
 
     if latitude and longitude:
-        latitude_boundaries, longitude_boundaries = get_affiliate_location_boundaries(latitude, longitude)
+        latitude_boundaries, longitude_boundaries = get_coordinate_boundaries(latitude, longitude)
 
         nearby_affiliates = AffiliateEntity.objects.filter(
             location_latitude__range=latitude_boundaries,
