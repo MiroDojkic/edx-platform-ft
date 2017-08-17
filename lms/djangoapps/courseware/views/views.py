@@ -201,7 +201,7 @@ def get_should_hide_master_course(request):
 
 
 def build_ccx_filters(request):
-    filter_fields = ['location_city', 'delivery_mode']
+    filter_fields = ['location_city', 'location_state', 'delivery_mode']
     filters = {}
 
     if not request.user.is_staff:
@@ -222,7 +222,7 @@ def build_ccx_filters(request):
     longitude = None
     if location_zipcode:
         geocoding_api_key = settings.GEOCODING_API_KEY
-        url = 'https://maps.googleapis.com/maps/api/geocode/json?address=' + location_zipcode + '+' + location_state + ',&key=' + geocoding_api_key
+        url = 'https://maps.googleapis.com/maps/api/geocode/json?address=' + location_zipcode + '+US,&key=' + geocoding_api_key
         json_response = requests.get(url).json()
 
         if len(json_response['results']) > 0:
