@@ -102,7 +102,7 @@ class CustomCourseForEdX(models.Model):
 
     @property
     def image_url(self):
-        if self.coach.profile.affiliate and self.coach.profile.affiliate.image:
+        if self.coach.profile.affiliate.image:
             return self.coach.profile.affiliate.image.url
         else:
             return 'https://s3.amazonaws.com/fasttrac-beta/default_full.png'
