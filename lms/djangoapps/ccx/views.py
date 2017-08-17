@@ -107,7 +107,7 @@ def coach_dashboard(view):
 
         if not course.enable_ccx:
             raise Http404
-        elif is_staff or is_instructor:
+        elif ccx and (is_staff or is_instructor):
             return view(request, course, ccx, **kwargs)
         else:
             if ccx is not None:
