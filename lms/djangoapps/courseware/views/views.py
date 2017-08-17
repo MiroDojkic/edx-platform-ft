@@ -214,21 +214,34 @@ def build_ccx_filters(request):
 
     date_from = request.POST.get('date_from')
     date_to = request.POST.get('date_to')
-
     location_zipcode = request.POST.get('location_zipcode')
-    location_state = request.POST.get('location_state')
 
+    if date_from:
+        filters['time__gte'] = datetime.strptime(date_from, '%m/%d/%Y')
+
+    if date_to:
+        filters['time__lte'] = datetime.strptime(date_to, '%m/%d/%Y')
+
+    if location_zipcode:
+        affiliate_location_filter = get_affiliate_location_filter(location_zipcode)
+        filters.update(affiliate_location_filter)
+
+    return filters
+
+
+def get_affiliate_location_filter(zipcode):
+    members = []
     latitude = None
     longitude = None
-    if location_zipcode:
-        geocoding_api_key = settings.GEOCODING_API_KEY
-        url = 'https://maps.googleapis.com/maps/api/geocode/json?address=' + location_zipcode + '+US,&key=' + geocoding_api_key
-        json_response = requests.get(url).json()
 
-        if len(json_response['results']) > 0:
-            location = json_response['results'][0]['geometry']['location']
-            latitude = location['lat']
-            longitude = location['lng']
+    geocoding_api_key = settings.GEOCODING_API_KEY
+    url = 'https://maps.googleapis.com/maps/api/geocode/json?address=' + zipcode + '+US,&key=' + geocoding_api_key
+    json_response = requests.get(url).json()
+
+    if len(json_response['results']) > 0:
+        location = json_response['results'][0]['geometry']['location']
+        latitude = location['lat']
+        longitude = location['lng']
 
     if latitude and longitude:
         latitude_max = latitude + 2
@@ -242,22 +255,12 @@ def build_ccx_filters(request):
             location_longitude__gte=longitude_min,
             location_longitude__lte=longitude_max
         )
-        members = []
 
         for affiliate in nearby_affiliates:
             for membership in affiliate.memberships:
                 members.append(membership.member)
 
-        filters['coach__in'] = members
-
-    if date_from:
-        filters['time__gte'] = datetime.strptime(date_from, '%m/%d/%Y')
-
-    if date_to:
-        filters['time__lte'] = datetime.strptime(date_to, '%m/%d/%Y')
-
-    return filters
-
+    return {'coach__in': members}
 
 def get_current_child(xmodule, min_depth=None, requested_child=None):
     """
