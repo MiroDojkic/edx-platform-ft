@@ -230,6 +230,16 @@ def build_ccx_filters(request):
 
 
 def get_affiliate_location_filter(zipcode):
+    """
+    Function receive zipcode by which the affiliate location search should be performed.
+
+    Fetches coordinates from the Google Geocoding API response
+    for the given zipcode.
+
+    Returns filter which looks for all courses of the affiliate members
+    for all affiliates whose location is withing boundaries
+    returned by get_coordinate_boundaries(latitude, longitude).
+    """
     members = []
     latitude = None
     longitude = None
@@ -244,14 +254,11 @@ def get_affiliate_location_filter(zipcode):
         longitude = location['lng']
 
     if latitude and longitude:
-        latitude_max = latitude + 2
-        longitude_max = longitude + 2
-        latitude_min = latitude - 2
-        longitude_min = longitude - 2
+        latitude_boundaries, longitude_boundaries = get_affiliate_location_boundaries(latitude, longitude)
 
         nearby_affiliates = AffiliateEntity.objects.filter(
-            location_latitude__range=(latitude_min, latitude_max),
-            location_longitude__range=(longitude_min, longitude_max)
+            location_latitude__range=latitude_boundaries,
+            location_longitude__range=longitude_boundaries
         )
 
         for affiliate in nearby_affiliates:
@@ -259,6 +266,17 @@ def get_affiliate_location_filter(zipcode):
                 members.append(membership.member)
 
     return {'coach__in': members}
+
+def get_coordinate_boundaries(latitude, longitude):
+    """
+    Function is used for searching courses by affiliate location.
+    Returns boundaries around the given coordinates (latitude, longitude),
+    inside which affiliate location is searched for.
+    """
+    latitude_boundaries = (latitude - 2, latitude + 2)
+    longitude_boundaries = (longitude - 2, longitude + 2)
+
+    return (latitude_boundaries, longitude_boundaries)
 
 def get_current_child(xmodule, min_depth=None, requested_child=None):
     """
