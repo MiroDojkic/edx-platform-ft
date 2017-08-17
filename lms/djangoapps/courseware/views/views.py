@@ -250,10 +250,8 @@ def get_affiliate_location_filter(zipcode):
         longitude_min = longitude - 2
 
         nearby_affiliates = AffiliateEntity.objects.filter(
-            location_latitude__gte=latitude_min,
-            location_latitude__lte=latitude_max,
-            location_longitude__gte=longitude_min,
-            location_longitude__lte=longitude_max
+            location_latitude__range=(latitude_min, latitude_max),
+            location_longitude__range=(longitude_min, longitude_max)
         )
 
         for affiliate in nearby_affiliates:
