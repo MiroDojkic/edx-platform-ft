@@ -173,7 +173,7 @@ def courses(request):
         "courseware/courses.html",
         {
             'courses': courses,
-            'affiliates': AffiliateEntity.objects.all(),
+            'affiliates': AffiliateEntity.objects.order_by('name'),
             'state_choices': STATE_CHOICES,
             'delivery_mode_choices': CustomCourseForEdX.DELIVERY_MODE_CHOICES,
             'filter_states': ccx_filters,
