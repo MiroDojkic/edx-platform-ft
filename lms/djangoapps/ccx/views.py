@@ -111,7 +111,7 @@ def coach_dashboard(view):
             return view(request, course, ccx, **kwargs)
         else:
             if ccx is not None:
-                if not has_ccx_coach_role(request.user, course.id):
+                if not has_ccx_coach_role(request.user, ccx.ccx_course_id):
                     return HttpResponseForbidden(
                         _('You must be the coach for this ccx to access this view')
                     )
