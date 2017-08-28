@@ -262,8 +262,8 @@ ${HTML(fragment.foot_html())}
             var unitName = $(".accordion-unit.active").data("unitName");
             var updatedUrl = window.location.href +
                 '?chapter=' + chapterName +
-                ',section=' + sectionName +
-                ',unit=' + unitName;
+                '&section=' + sectionName +
+                '&unit=' + unitName;
 
             window.history.pushState(null, null, updatedUrl);
         }
