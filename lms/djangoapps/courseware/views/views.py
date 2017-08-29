@@ -66,6 +66,7 @@ from courseware.masquerade import setup_masquerade
 from courseware.model_data import FieldDataCache, ScoresClient
 from courseware.models import StudentModule, BaseStudentModuleHistory
 from courseware.url_helpers import get_redirect_url, get_redirect_url_for_global_staff
+from courseware.gis_helpers import change_in_latitude, change_in_longitude
 from courseware.user_state_client import DjangoXBlockUserStateClient
 from edxmako.shortcuts import render_to_response, render_to_string, marketing_link
 from instructor.enrollment import uses_shib
@@ -214,7 +215,9 @@ def build_ccx_filters(request):
 
     date_from = request.POST.get('date_from')
     date_to = request.POST.get('date_to')
+
     location_zipcode = request.POST.get('location_zipcode')
+    location_search_radius = request.POST.get('location_search_radius')
 
     if date_from:
         filters['time__gte'] = datetime.strptime(date_from, '%m/%d/%Y')
@@ -223,13 +226,13 @@ def build_ccx_filters(request):
         filters['time__lte'] = datetime.strptime(date_to, '%m/%d/%Y')
 
     if location_zipcode:
-        affiliate_location_filter = get_affiliate_location_filter(location_zipcode)
+        affiliate_location_filter = get_affiliate_location_filter(location_zipcode, location_search_radius)
         filters.update(affiliate_location_filter)
 
     return filters
 
 
-def get_affiliate_location_filter(zipcode):
+def get_affiliate_location_filter(zipcode, radius):
     """
     Function receive zipcode by which the affiliate location search should be performed.
 
@@ -238,7 +241,7 @@ def get_affiliate_location_filter(zipcode):
 
     Returns filter which looks for all courses of the affiliate members
     for all affiliates whose location is withing boundaries
-    returned by get_coordinate_boundaries(latitude, longitude).
+    returned by get_coordinate_boundaries(latitude, longitude, radius).
     """
     members = []
     latitude = None
@@ -254,12 +257,9 @@ def get_affiliate_location_filter(zipcode):
         longitude = location['lng']
 
     if latitude and longitude:
-        latitude_boundaries, longitude_boundaries = get_coordinate_boundaries(latitude, longitude)
+        latitude_boundaries, longitude_boundaries = get_coordinate_boundaries(latitude, longitude, radius)
 
-        nearby_affiliates = AffiliateEntity.objects.filter(
-            location_latitude__range=latitude_boundaries,
-            location_longitude__range=longitude_boundaries
-        )
+        nearby_affiliates = AffiliateEntity.objects.filter(location_latitude__range=latitude_boundaries, location_longitude__range=longitude_boundaries)
 
         for affiliate in nearby_affiliates:
             for membership in affiliate.memberships:
@@ -267,15 +267,17 @@ def get_affiliate_location_filter(zipcode):
 
     return {'coach__in': members}
 
-def get_coordinate_boundaries(latitude, longitude):
+def get_coordinate_boundaries(latitude, longitude, radius):
     """
     Function is used for searching courses by affiliate location.
     Returns boundaries around the given coordinates (latitude, longitude),
     inside which affiliate location is searched for.
     """
-    search_radius = 2
-    latitude_boundaries = (latitude - search_radius, latitude + search_radius)
-    longitude_boundaries = (longitude - search_radius, longitude + search_radius)
+    latitude_radius = change_in_latitude(float(radius))
+    longitude_radius = change_in_longitude(latitude_radius, float(radius))
+
+    latitude_boundaries = (latitude - latitude_radius, latitude + latitude_radius)
+    longitude_boundaries = (longitude - longitude_radius, longitude + longitude_radius)
 
     return (latitude_boundaries, longitude_boundaries)
 
