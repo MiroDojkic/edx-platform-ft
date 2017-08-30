@@ -17,7 +17,7 @@
     </div>
 
     <div class="sidebar-body">
-      <form action="/affiliates/" method="POST">
+      <form class="affiliate-filter-form" action="/affiliates/" method="POST">
         <a href="/affiliates" class="clear-all"> <span class="fa fa-remove"></span> Clear All</a>
         <div class="sidebar-filter">
           <div class="fa fa-user"></div>
@@ -35,6 +35,15 @@
               <option value="${choice[0]}" ${ 'selected' if affiliate_state == choice[0] else '' }>${choice[1]}</option>
             % endfor
           </select>
+          <input type="text" name="affiliate_zipcode" class="affiliate_zipcode" placeholder="Zipcode">
+          <select name="affiliate_search_radius" name="affiliate_search_radius">
+              <option selected disabled> search radius </option>
+              <option value="5">5 miles</option>
+              <option value="10">10 miles</option>
+              <option value="20">20 miles</option>
+              <option value="50">50 miles</option>
+              <option value="100">100 miles</option>
+            </select>
         </div>
 
         <input type="hidden" name="csrfmiddlewaretoken" value="${csrf_token}" />
@@ -44,10 +53,61 @@
   </div>
 
   <script>
+    // Geographic information system (GIS) logic
+    function values (obj) {
+      return Object.keys(obj).map(function (key) {
+        return obj[key];
+      });
+    }
+
+    function buildGisApiUrl(zipcode) {
+      var baseUrl = 'https://maps.googleapis.com/maps/api/geocode/json?address=';
+
+      return baseUrl + '+' + zipcode;
+    }
+
+    function submitFormWithCoordinates(e) {
+      var $form = $('.affiliate-filter-form');
+      var $inputs = $form.filter(':input');
+      var zipcode = $inputs.filter(".affiliate_zipcode").val();
+      var gisApiUrl = buildGisApiUrl(zipcode);
+
+      var xhr = new XMLHttpRequest();
+      xhr.open('GET', gisApiUrl, false);
+      xhr.onload = function () {
+        if (this.status === 200) {
+          var results = JSON.parse(this.responseText).results;
+          if (results.length === 0) {
+            var latitude = 0;
+            var longitude = 0;
+          } else {
+            var location = results[0].geometry.location
+            var latitude = location.lat;
+            var longitude = location.lng;
+          }
+
+          var $latitudeField = $('<input />').attr('type', 'hidden')
+            .attr('name', 'latitude')
+            .attr('value', latitude);
+          var $longitudeField = $('<input />').attr('type', 'hidden')
+            .attr('name', 'longitude')
+            .attr('value', longitude);
+
+          $latitudeField.appendTo($form);
+          $longitudeField.appendTo($form);
+        }
+      };
+      xhr.send(null);
+
+      return true;
+    }
+
     $(document).ready(function(){
       $('.explore-header').on('click', function() {
         $('.hidden-explore-option').toggleClass('hidden');
       })
+
+      $('.affiliate-filter-form').on('submit', submitFormWithCoordinates);
     })
   </script>
 
