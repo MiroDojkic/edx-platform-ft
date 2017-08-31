@@ -170,7 +170,7 @@
     var $form = $('.course-filter-form');
     var zipcode = $('.course-filter-form .location_zipcode').val();
     var gisApiUrl = buildGisApiUrl(zipcode);
-    debugger;
+
     var xhr = new XMLHttpRequest();
     xhr.open('GET', gisApiUrl, false);
     xhr.onload = function () {
@@ -191,7 +191,7 @@
         var $longitudeField = $('<input />').attr('type', 'hidden')
           .attr('name', 'longitude')
           .attr('value', longitude);
-        debugger;
+
         $latitudeField.appendTo($form);
         $longitudeField.appendTo($form);
       }
