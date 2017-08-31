@@ -21,7 +21,7 @@
     <div class="search-facets-lists">
       <a href="/courses" class="clear-all"> <span class="fa fa-remove"></span> Clear All</a>
       <br>
-      <form action="/courses" method="POST">
+      <form class="course-filter-form" action="/courses" method="POST">
         <h3 class="header-facet">
           <i class="fa fa-calendar"></i>
           START DATE
@@ -81,7 +81,7 @@
           </li>
           <br>
           <li>
-            <input type="text" name="location_zipcode" placeholder="zipcode" />
+            <input type="text" name="location_zipcode" class="location_zipcode" placeholder="zipcode" />
           </li>
           <br>
           <li>
@@ -153,6 +153,54 @@
 </main>
 
 <script>
+  // Geographic information system (GIS) logic
+  function values (obj) {
+    return Object.keys(obj).map(function (key) {
+      return obj[key];
+    });
+  }
+
+  function buildGisApiUrl(zipcode) {
+    var baseUrl = 'https://maps.googleapis.com/maps/api/geocode/json?address=';
+
+    return baseUrl + '+' + zipcode + '+US';
+  }
+
+  function submitFormWithCoordinates(e) {
+    var $form = $('.course-filter-form');
+    var zipcode = $('.course-filter-form .location_zipcode').val();
+    var gisApiUrl = buildGisApiUrl(zipcode);
+    debugger;
+    var xhr = new XMLHttpRequest();
+    xhr.open('GET', gisApiUrl, false);
+    xhr.onload = function () {
+      if (this.status === 200) {
+        var results = JSON.parse(this.responseText).results;
+        if (results.length === 0) {
+          var latitude = 0;
+          var longitude = 0;
+        } else {
+          var location = results[0].geometry.location
+          var latitude = location.lat;
+          var longitude = location.lng;
+        }
+
+        var $latitudeField = $('<input />').attr('type', 'hidden')
+          .attr('name', 'latitude')
+          .attr('value', latitude);
+        var $longitudeField = $('<input />').attr('type', 'hidden')
+          .attr('name', 'longitude')
+          .attr('value', longitude);
+        debugger;
+        $latitudeField.appendTo($form);
+        $longitudeField.appendTo($form);
+      }
+    };
+    xhr.send(null);
+
+    return true;
+  }
+
   $(document).ready(function(){
     $('.wrapper-footer').addClass('relative-footer')
 
@@ -168,6 +216,8 @@
         $(this).prop('checked', true);
       }
     });
+
+    $('.course-filter-form').on('submit', submitFormWithCoordinates);
   });
 </script>
 
