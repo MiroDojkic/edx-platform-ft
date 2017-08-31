@@ -22,9 +22,4 @@ class Migration(migrations.Migration):
             name='location_longitude',
             field=models.FloatField(null=True, blank=True),
         ),
-        migrations.AlterField(
-            model_name='customcourseforedx',
-            name='time',
-            field=models.DateTimeField(default=datetime.datetime(2017, 8, 31, 4, 20, 50, 236527)),
-        ),
     ]

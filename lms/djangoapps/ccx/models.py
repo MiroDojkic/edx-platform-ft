@@ -85,29 +85,29 @@ class CustomCourseForEdX(models.Model):
     location_latitude = models.FloatField(null=True, blank=True)
     location_longitude = models.FloatField(null=True, blank=True)
 
-    __full_address = None
-
     enrollment_end_date = models.DateTimeField(null=True, blank=True)
     end_date = models.DateTimeField(null=True, blank=True)
+
+    _full_address = None
 
     class Meta(object):
         app_label = 'ccx'
 
     def __init__(self, *args, **kwargs):
         super(CustomCourseForEdX, self).__init__(*args, **kwargs)
-        self.__full_address = self.build_full_address()
+        self._full_address = self.build_full_address()
 
 
     def save(self, *args, **kwargs):
         new_full_address = self.build_full_address()
 
-        if self.__full_address != new_full_address:
+        if self._full_address != new_full_address:
             latitude, longitude = self.get_location_coordinates()
             setattr(self, 'location_latitude', latitude)
             setattr(self, 'location_longitude', longitude)
 
         super(CustomCourseForEdX, self).save(*args, **kwargs)
-        self.__full_address = new_full_address
+        self._full_address = new_full_address
 
     def delete(self):
         with transaction.atomic():
