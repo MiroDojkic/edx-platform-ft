@@ -63,13 +63,12 @@
     function buildGisApiUrl(zipcode) {
       var baseUrl = 'https://maps.googleapis.com/maps/api/geocode/json?address=';
 
-      return baseUrl + '+' + zipcode;
+      return baseUrl + '+' + zipcode + '+US';
     }
 
     function submitFormWithCoordinates(e) {
       var $form = $('.affiliate-filter-form');
-      var $inputs = $form.filter(':input');
-      var zipcode = $inputs.filter(".affiliate_zipcode").val();
+      var zipcode = $('.affiliate-filter-form .affiliate_zipcode').val();
       var gisApiUrl = buildGisApiUrl(zipcode);
 
       var xhr = new XMLHttpRequest();
