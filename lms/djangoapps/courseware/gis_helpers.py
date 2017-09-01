@@ -16,7 +16,16 @@ def change_in_longitude(latitude, miles):
     r = EARTH_RADIUS*math.cos(math.radians(latitude))
     return math.degrees(miles/r)
 
+# Great-circle method
 def coordinates_distance(first, second):
+    '''
+    Measures distance between two geographical coordinates.
+    Params
+    - first: coordinate(latitude, longitude)
+    - second: coordinate(latitude, longitude)
+
+    Returns distance in miles
+    '''
     latitude_1, longitude_1 = math.radians(
         first['latitude']), math.radians(first['longitude'])
     latitude_2, longitude_2 = math.radians(
