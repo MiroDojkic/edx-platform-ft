@@ -53,13 +53,6 @@
   </div>
 
   <script>
-    // Geographic information system (GIS) logic
-    function values (obj) {
-      return Object.keys(obj).map(function (key) {
-        return obj[key];
-      });
-    }
-
     function buildGisApiUrl(zipcode) {
       var baseUrl = 'https://maps.googleapis.com/maps/api/geocode/json?address=';
 
@@ -70,33 +63,34 @@
       var $form = $('.affiliate-filter-form');
       var zipcode = $('.affiliate-filter-form .affiliate_zipcode').val();
       var gisApiUrl = buildGisApiUrl(zipcode);
+      if (zipcode) {
+        var xhr = new XMLHttpRequest();
+        xhr.open('GET', gisApiUrl, false);
+        xhr.onload = function () {
+          if (this.status === 200) {
+            var results = JSON.parse(this.responseText).results;
+            if (results.length === 0) {
+              var latitude = 0;
+              var longitude = 0;
+            } else {
+              var location = results[0].geometry.location
+              var latitude = location.lat;
+              var longitude = location.lng;
+            }
 
-      var xhr = new XMLHttpRequest();
-      xhr.open('GET', gisApiUrl, false);
-      xhr.onload = function () {
-        if (this.status === 200) {
-          var results = JSON.parse(this.responseText).results;
-          if (results.length === 0) {
-            var latitude = 0;
-            var longitude = 0;
-          } else {
-            var location = results[0].geometry.location
-            var latitude = location.lat;
-            var longitude = location.lng;
+            var $latitudeField = $('<input />').attr('type', 'hidden')
+              .attr('name', 'latitude')
+              .attr('value', latitude);
+            var $longitudeField = $('<input />').attr('type', 'hidden')
+              .attr('name', 'longitude')
+              .attr('value', longitude);
+
+            $latitudeField.appendTo($form);
+            $longitudeField.appendTo($form);
           }
-
-          var $latitudeField = $('<input />').attr('type', 'hidden')
-            .attr('name', 'latitude')
-            .attr('value', latitude);
-          var $longitudeField = $('<input />').attr('type', 'hidden')
-            .attr('name', 'longitude')
-            .attr('value', longitude);
-
-          $latitudeField.appendTo($form);
-          $longitudeField.appendTo($form);
-        }
-      };
-      xhr.send(null);
+        };
+        xhr.send(null);
+      }
 
       return true;
     }
