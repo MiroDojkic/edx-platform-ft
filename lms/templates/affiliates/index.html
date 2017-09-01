@@ -37,13 +37,15 @@
           </select>
           <input type="text" name="affiliate_zipcode" class="affiliate_zipcode" placeholder="Zipcode">
           <select name="affiliate_search_radius" name="affiliate_search_radius">
-              <option selected disabled> search radius </option>
-              <option value="5">5 miles</option>
-              <option value="10">10 miles</option>
-              <option value="20">20 miles</option>
-              <option value="50">50 miles</option>
-              <option value="100">100 miles</option>
-            </select>
+            <option selected disabled> search radius </option>
+            <option value="5">5 miles</option>
+            <option value="10">10 miles</option>
+            <option value="20">20 miles</option>
+            <option value="50">50 miles</option>
+            <option value="100">100 miles</option>
+          </select>
+          <input class="latitude-field" type="hidden" name="latitude">
+          <input class="longitude-field" type="hidden" name="longitude">
         </div>
 
         <input type="hidden" name="csrfmiddlewaretoken" value="${csrf_token}" />
@@ -61,32 +63,25 @@
 
     function submitFormWithCoordinates(e) {
       var $form = $('.affiliate-filter-form');
-      var zipcode = $('.affiliate-filter-form .affiliate_zipcode').val();
+      var zipcode = $form.find('.affiliate_zipcode').val();
+      var $latitudeField = $form.find('.latitude-field');
+      var $longitudeField = $form.find('.longitude-field');
       var gisApiUrl = buildGisApiUrl(zipcode);
+
       if (zipcode) {
         var xhr = new XMLHttpRequest();
         xhr.open('GET', gisApiUrl, false);
         xhr.onload = function () {
           if (this.status === 200) {
             var results = JSON.parse(this.responseText).results;
-            if (results.length === 0) {
-              var latitude = 0;
-              var longitude = 0;
-            } else {
+            if (results.length !== 0) {
               var location = results[0].geometry.location
               var latitude = location.lat;
               var longitude = location.lng;
+
+              $latitudeField.val(latitude);
+              $longitudeField.val(longitude);
             }
-
-            var $latitudeField = $('<input />').attr('type', 'hidden')
-              .attr('name', 'latitude')
-              .attr('value', latitude);
-            var $longitudeField = $('<input />').attr('type', 'hidden')
-              .attr('name', 'longitude')
-              .attr('value', longitude);
-
-            $latitudeField.appendTo($form);
-            $longitudeField.appendTo($form);
           }
         };
         xhr.send(null);
