@@ -148,8 +148,7 @@ def courses(request):
     affiliate_id = request.POST.get('affiliate_id')
     latitude = request.POST.get('latitude', '')
     longitude = request.POST.get('longitude', '')
-    if latitude and longitude:
-        ccx_filters['delivery_mode'] = CustomCourseForEdX.IN_PERSON
+
 
     if affiliate_id:
         affiliate = AffiliateEntity.objects.get(pk=affiliate_id)
@@ -183,6 +182,7 @@ def courses(request):
             for course in courses:
                 if str(course.id) == str(ccx.ccx_course_id):
                     ordered_courses.append(course)
+                    break
 
         courses = ordered_courses
         if len(courses) > 0:
@@ -232,7 +232,8 @@ def build_ccx_filters(request):
 
         filters['location_latitude__range'] = latitude_boundaries
         filters['location_longitude__range'] = longitude_boundaries
-        filter_fields = ['delivery_mode']
+        filters['delivery_mode'] = CustomCourseForEdX.IN_PERSON
+        filter_fields = []
     else:
         filter_fields = ['location_city', 'location_state', 'delivery_mode']
 
