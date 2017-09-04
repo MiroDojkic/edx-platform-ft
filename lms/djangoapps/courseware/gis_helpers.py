@@ -27,9 +27,9 @@ def coordinates_distance(first, second):
     Returns distance in miles
     '''
     latitude_1, longitude_1 = math.radians(
-        first['latitude']), math.radians(first['longitude'])
+        float(first['latitude'])), math.radians(float(first['longitude']))
     latitude_2, longitude_2 = math.radians(
-        second['latitude']), math.radians(second['longitude'])
+        float(second['latitude'])), math.radians(float(second['longitude']))
 
     sin_latitude_1, cos_latitude_1 = math.sin(latitude_1), math.cos(latitude_1)
     sin_latitude_2, cos_latitude_2 = math.sin(latitude_2), math.cos(latitude_2)
