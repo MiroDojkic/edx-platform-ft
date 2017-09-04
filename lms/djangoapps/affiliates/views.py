@@ -46,7 +46,8 @@ def index(request):
 
     user_messages = []
     if location_latitude and location_longitude:
-        affiliates = sorted(affiliates, key=lambda a: a.distance_from({ 'latitude': location_latitude, 'longitude': location_longitude }))
+        affiliates = sorted(affiliates, key=lambda affiliate: affiliate.distance_from(
+            {'latitude': location_latitude, 'longitude': location_longitude}))
         user_messages.append('Affiliates are sorted by the distance!')
 
     return render_to_response('affiliates/index.html', {
