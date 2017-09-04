@@ -182,7 +182,7 @@ def courses(request):
                 ordered_courses.extend([course for course in courses if str(course.id) == str(ccx.ccx_course_id)])
 
         courses = ordered_courses
-        if (len(courses) > 0):
+        if len(courses) > 0:
             user_messages.append('Courses are sorted by the distance!')
 
     return render_to_response(
