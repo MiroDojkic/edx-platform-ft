@@ -107,8 +107,8 @@ class CustomCourseForEdX(models.Model):
             setattr(self, 'location_latitude', latitude)
             setattr(self, 'location_longitude', longitude)
 
+        # All ccxs originating from Fasttrac master course should be private
         partial_course_key = settings.FASTTRAC_COURSE_KEY.split(':')[1]
-
         if partial_course_key in unicode(self.course_id):
             self.enrollment_type = self.PRIVATE
 
