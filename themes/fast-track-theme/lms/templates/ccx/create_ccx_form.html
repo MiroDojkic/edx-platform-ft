@@ -176,16 +176,16 @@
             <p class="field-name">${_('ENROLLMENT TYPE')}</p>
             <label class="sr" for="ccx_enrollment_type">${_('Enrollment type')}</label>
             % if is_from_fasttrac_course:
-              <select name="enrollment_type" id="ccx_enrollment_type" class="ccx-select" disabled>
-                <% private_enrollment_choice = enrollment_choices[0][1]%>
-                <option selected disabled value="">${private_enrollment_choice}</option>
-              </select>
-            % else:
               <select name="enrollment_type" id="ccx_enrollment_type" class="ccx-select" required>
                   <option selected disabled value="">select option...</option>
                   % for choice in enrollment_choices:
                       <option value="${choice[0]}">${choice[1]}</option>
                   % endfor
+              </select>
+            % else:
+              <select name="enrollment_type" id="ccx_enrollment_type" class="ccx-select" disabled>
+                <% private_enrollment_choice = enrollment_choices[0][1]%>
+                <option selected disabled value="">${private_enrollment_choice}</option>
               </select>
             % endif
         </div>
