@@ -739,3 +739,45 @@ label.u-field-title {
   }
 }
 
+.onboarding-survey {
+  width: 100%;
+  height: 102%;
+
+  position: fixed;
+  top: 51%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+
+  background: lightgrey;
+  z-index: 1000;
+
+  &.hidden {
+    display: none;
+  }
+
+  .sg-body {
+    background: transparent;
+
+    form {
+      box-shadow: 5px 5px 5px 0px #ccc;
+    }
+  }
+
+  .exit-button {
+    width: 82px;
+    height: 33px;
+
+    position: absolute;
+    top: 34px;
+    right: 180px;
+
+    background: orange;
+    text-align: center;
+    font-size: 1rem;
+  }
+}
+
+.no-scroll {
+  overflow-y: hidden;
+}
+

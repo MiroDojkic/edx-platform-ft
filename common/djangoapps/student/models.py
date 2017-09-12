@@ -370,6 +370,7 @@ class UserProfile(models.Model):
     twitter_link = models.CharField(null=True, blank=True, max_length=255)
     linkedin_link = models.CharField(null=True, blank=True, max_length=255)
     public_email = models.CharField(null=True, blank=True, max_length=255)
+    filled_onboarding_survey_at = models.DateTimeField(null=True, blank=True, default=None)
 
     # field for affiliate program directors
     affiliate_organization_name = models.CharField(null=True, blank=True, default='', max_length=255)
