@@ -111,6 +111,10 @@
               % endfor
             </select>
           </li>
+          <br>
+          <li class="affiliate-typeahead-wrapper">
+            <input type="text" name="affiliate_search" class="affiliate-typeahead" autocomplete="off">
+          </li>
         </ul>
 
         <input type="hidden" name="csrfmiddlewaretoken" value="${csrf_token}" />
@@ -210,6 +214,14 @@
     });
 
     $('.course-filter-form').on('submit', submitFormWithCoordinates);
+
+    var typeAheadOpts = {
+      minLength: 1,
+      limit: true,
+      fulltext: true
+    };
+
+    var typeAhead = new TypeAhead(document.querySelector('.affiliate-typeahead'), ['marin', 'miro', 'ivana', 'miro2', 'miro3'], typeAheadOpts);
   });
 </script>
 
