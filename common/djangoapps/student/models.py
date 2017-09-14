@@ -31,6 +31,7 @@ from django.utils import timezone
 from django.contrib.auth.models import User
 from django.contrib.auth.hashers import make_password
 from django.contrib.auth.signals import user_logged_in, user_logged_out
+from django.contrib.postgres.fields import JSONField
 from django.db import models, IntegrityError, transaction
 from django.db.models import Count
 from django.db.models.signals import pre_save, post_save
@@ -375,6 +376,20 @@ class UserProfile(models.Model):
     # field for affiliate program directors
     affiliate_organization_name = models.CharField(null=True, blank=True, default='', max_length=255)
     description = models.CharField(null=True, blank=True, max_length=255, default='')
+
+    # pre-survey fields
+    IS_INTERESTED_IN_LEARNING_CHOICES = (
+        ('existing_business', ugettext_noop('Hope to apply FastTrac knowledge to a business I have already started')),
+        ('new_business', ugettext_noop('Hope to apply FastTrac knowledge to starting a new business')),
+        ('both', ugettext_noop('Both')),
+    )
+
+    motivation_for_visit = models.CharField(null=True, blank=True)
+    is_running_business = models.BooleanField(null=True, blank=True)
+    is_interested_in_learning = models.CharField(null=True, blank=True, choices=IS_INTERESTED_IN_LEARNING_CHOICES)
+    started_business = models.BooleanField(null=True, blank=True)
+    risk_opinions = JSONField()
+    personality_traits = JSONField()
 
     # MailChimp interests
     ENTREPRENEUR_MAILCHIMP_INTEREST_ID = '83d6404c2e'
