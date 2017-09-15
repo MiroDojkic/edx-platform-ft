@@ -174,9 +174,7 @@ from pipeline_mako import render_require_js_path_overrides
           </div>
         </a>
       </div>
-    % endif
 
-    % if not request.user.is_anonymous():
       <script type="text/javascript">
         $(document).ready(function () {
           var presurveyModal = $('.presurvey-modal');
@@ -185,7 +183,7 @@ from pipeline_mako import render_require_js_path_overrides
           if (!filledPresurveyAt || filledPresurveyAt === 'None') {
             presurveyModal.removeClass('hidden');
             $('body').addClass('no-scroll');
-            $('.content-wrapper').addClass('transparent');
+            $('.content-wrapper').addClass('transparent no-click');
           }
         });
       </script>

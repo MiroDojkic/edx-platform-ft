@@ -798,6 +798,10 @@ label.u-field-title {
   overflow-y: hidden;
 }
 
+.no-click {
+  pointer-events: none;
+}
+
 .transparent {
   opacity: 0.2;
 }
