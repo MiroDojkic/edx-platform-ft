@@ -168,7 +168,7 @@ from pipeline_mako import render_require_js_path_overrides
           <h1>Hi ${request.user.first_name}!</h1>
           <h2>You didn't fill out our pre-survey yet.</h2>
         </span>
-        <a href="http://www.surveygizmo.com/s3/3821471/FastTrac-Pre-Survey-Full?sguid=${request.user.email}">
+        <a href="${settings.SG_PRESURVEY_URL}?sguid=${request.user.email}">
           <div class="control-button">
             <h2>Please click here!</h2>
           </div>
