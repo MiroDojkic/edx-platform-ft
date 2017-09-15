@@ -103,18 +103,9 @@
           AFFILIATE
         </h3>
         <ul class="facet-list">
-          <li>
-            <select name="affiliate_id">
-              <option selected disabled> select affiliate </option>
-              % for affiliate in affiliates:
-                <option value="${affiliate.pk}" ${ 'selected' if affiliate_id == unicode(affiliate.pk) else '' }>${affiliate.name}</option>
-              % endfor
-            </select>
-          </li>
-          <br>
           <li class="affiliate-typeahead-wrapper">
-            <input type="text" name="affiliate_search" class="affiliate-typeahead" autocomplete="off">
-            <input type="hidden" name="affiliate_typeahead_id" class="affiliate_typeahead_id">
+            <input type="text" name="affiliate_search" class="affiliate-typeahead" autocomplete="off" data-affiliates='${affiliates_as_json}'>
+            <input type="hidden" name="affiliate_id" class="affiliate_typeahead_id">
           </li>
         </ul>
 
@@ -217,15 +208,21 @@
     $('.course-filter-form').on('submit', submitFormWithCoordinates);
 
     var typeAheadOpts = {
-      minLength: 1,
+      minLength: 0,
       limit: true,
       fulltext: true
     };
 
-    var typeAhead = new TypeAhead(document.querySelector('.affiliate-typeahead'), [{name: 'marin', id: 1}, {name: 'miro', id: 2}, {name: 'ivana', id: 3}, {name: 'miro2', id: 4}, {name: 'miro3', id: 5}], typeAheadOpts);
+    var typeAheadInput = document.querySelector('.affiliate-typeahead');
+
+    var typeAhead = new TypeAhead(
+      typeAheadInput,
+      $('.affiliate-typeahead').data('affiliates'),
+      typeAheadOpts
+    );
 
     typeAhead.getItemValue = function (item) {
-      return item.name;
+      return item.fields.name;
     }
 
     TypeAhead.prototype.value = function (value) {
@@ -240,8 +237,10 @@
             this.element.fireEvent('onchange');
         }
 
-        $('.affiliate_typeahead_id').val(value.id);
+        $('.affiliate_typeahead_id').val(value.pk);
     };
+
+    TypeAhead.prototype.handleFocus = TypeAhead.prototype.handleKeyUp;
   });
 </script>
 

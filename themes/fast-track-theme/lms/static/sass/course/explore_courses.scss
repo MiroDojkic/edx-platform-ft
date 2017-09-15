@@ -134,10 +134,15 @@ $ft-orange: #f76b1c;
       color: black;
     }
 
-    &.active {
+    &.active,
+    &:hover {
       background: $ft-orange;
       border: 0.5px solid $ft-orange;
       border-top: none;
+
+      a {
+        text-decoration: none;
+      }
     }
   }
 }
