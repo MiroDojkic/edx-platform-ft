@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
 from django.contrib import messages
 from django.core import serializers
@@ -7,17 +8,31 @@ from django.http import Http404
 from lms.envs.common import STATE_CHOICES
 from django_countries import countries
 from edxmako.shortcuts import render_to_response, render_to_string
-
+from lms.djangoapps.ccx.models import CustomCourseForEdX
 from .models import AffiliateEntity, AffiliateMembership
 from django.contrib.auth.models import User
+from student.models import CourseEnrollment
 from lms.djangoapps.instructor.views.tools import get_student_from_identifier
 from .decorators import only_program_director, only_staff
 
+@only_staff
 def admin(request):
     affiliates = AffiliateEntity.objects.all().order_by('name')
+    ccxs = CustomCourseForEdX.objects.all()
+    ccxs = sorted(ccxs, key = lambda ccx: ccx.affiliate.name)
+    fasttrac_course_key = settings.FASTTRAC_COURSE_KEY
+
+    total_learners = CourseEnrollment.objects.filter(is_active=True).count()
+    total_fasttrac_learners = CourseEnrollment.objects.filter(is_active=True, course_id__startswith=fasttrac_course_key).count()
+    total_affiliate_learners = CourseEnrollment.objects.filter(is_active=True).exclude(course_id__startswith=fasttrac_course_key).count()
 
     return render_to_response('affiliates/admin.html', {
         'affiliates': affiliates,
+        'ccxs': ccxs,
+        'partial_course_key': fasttrac_course_key.split(':')[1],
+        'total_learners': total_learners,
+        'total_fasttrac_learners': total_fasttrac_learners,
+        'total_affiliate_learners': total_affiliate_learners
     })
 
 def index(request):
@@ -158,6 +173,12 @@ def delete(request, slug):
     AffiliateEntity.objects.get(slug=slug).delete()
 
     return redirect('affiliates:index')
+
+
+def payment(request):
+    return render_to_response('affiliates/payment.html', {
+        'preview': settings.PAYMENT_PREVIEW
+    })
 
 
 @only_staff

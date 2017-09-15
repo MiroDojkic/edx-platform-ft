@@ -376,9 +376,20 @@ class UserProfile(models.Model):
     affiliate_organization_name = models.CharField(null=True, blank=True, default='', max_length=255)
     description = models.CharField(null=True, blank=True, max_length=255, default='')
 
+    # presurvey info
+    filled_presurvey_at = models.DateTimeField(null=True, blank=True)
+
     # MailChimp interests
     ENTREPRENEUR_MAILCHIMP_INTEREST_ID = '83d6404c2e'
     AFFILIATE_MAILCHIMP_INTEREST_ID = 'f6cdcb8e7b'
+
+    @property
+    def is_incomplete(self):
+        return not (self.mailing_address and self.secondary_address
+            and self.city and self.state and self.phone_number
+            and self.company and self.title and self.immigrant_status
+            and self.veteran_status and self.education
+            and self.facebook_link and self.linkedin_link and self.twitter_link)
 
     @property
     def affiliate_role(self):
@@ -425,6 +436,10 @@ class UserProfile(models.Model):
         """ Convenience method that returns the human readable gender. """
         if self.gender:
             return self.__enumerable_to_display(self.GENDER_CHOICES, self.gender)
+
+    def set_presurvey_status(self):
+        self.filled_presurvey_at = datetime.now(UTC)
+        self.save()
 
     def get_meta(self):  # pylint: disable=missing-docstring
         js_str = self.meta
