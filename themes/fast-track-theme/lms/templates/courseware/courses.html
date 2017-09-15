@@ -114,6 +114,7 @@
           <br>
           <li class="affiliate-typeahead-wrapper">
             <input type="text" name="affiliate_search" class="affiliate-typeahead" autocomplete="off">
+            <input type="hidden" name="affiliate_typeahead_id" class="affiliate_typeahead_id">
           </li>
         </ul>
 
@@ -221,7 +222,26 @@
       fulltext: true
     };
 
-    var typeAhead = new TypeAhead(document.querySelector('.affiliate-typeahead'), ['marin', 'miro', 'ivana', 'miro2', 'miro3'], typeAheadOpts);
+    var typeAhead = new TypeAhead(document.querySelector('.affiliate-typeahead'), [{name: 'marin', id: 1}, {name: 'miro', id: 2}, {name: 'ivana', id: 3}, {name: 'miro2', id: 4}, {name: 'miro3', id: 5}], typeAheadOpts);
+
+    typeAhead.getItemValue = function (item) {
+      return item.name;
+    }
+
+    TypeAhead.prototype.value = function (value) {
+        this.selected = value;
+        this.element.value = this.getItemValue(value);
+
+        if (document.createEvent) {
+            var e = document.createEvent('HTMLEvents');
+            e.initEvent('change', true, false);
+            this.element.dispatchEvent(e);
+        } else {
+            this.element.fireEvent('onchange');
+        }
+
+        $('.affiliate_typeahead_id').val(value.id);
+    };
   });
 </script>
 
