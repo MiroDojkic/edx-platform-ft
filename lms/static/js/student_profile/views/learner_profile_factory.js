@@ -85,11 +85,13 @@
             });
 
             var sectionOneFieldViews = [
-                new FieldsView.ReadonlyFieldView({
+                new FieldsView.TextareaFieldView({
                     model: accountSettingsModel,
-                    screenReaderTitle: gettext('Email'),
-                    valueAttribute: "email",
-                    helpMessage: ""
+                    messagePosition: 'header',
+                    editable: editable,
+                    persistChanges: true,
+                    valueAttribute: 'email',
+                    title: 'Email'
                 }),
                 new FieldsView.DropdownFieldView({
                     model: accountSettingsModel,
