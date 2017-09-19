@@ -17,7 +17,6 @@ from util.model_utils import emit_setting_changed_event
 
 from openedx.core.lib.api.view_utils import add_serializer_errors
 import requests
-import logging
 
 from ..errors import (
     AccountUpdateError, AccountValidationError, AccountUsernameInvalid, AccountPasswordInvalid,
