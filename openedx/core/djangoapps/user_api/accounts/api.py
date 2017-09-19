@@ -159,7 +159,8 @@ def update_account_settings(requesting_user, update, username=None):
                 'newEmail': update.get('email')}
         headers = {'Authorization': settings.WORKSPACE_API_KEY}
         response = requests.post(
-            'http://10.0.2.3:3000/api/responses/change_email', headers=headers, data=data)
+    settings.WORKSPACE_URL + '/api/responses/change_email', headers=headers, data=data)
+
 
         if not response.status_code == 200:
             if response.status_code == 404:
