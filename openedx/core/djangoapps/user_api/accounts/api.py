@@ -137,15 +137,6 @@ def update_account_settings(requesting_user, update, username=None):
     if "name" in update:
         old_name = existing_user_profile.name
 
-    if "email" in update:
-        # Update email in workspace app
-        data = { 'oldEmail': existing_user.email, 'newEmail': update.get('email') }
-        response = requests.post('http://10.0.2.3:3000/api/responses/change_email', data=data)
-        log = logging.getLogger(__name__)
-        if response.status_code == 404:
-            log.warning("User with email:" + existing_user.email + "doesn't exist in workspace.")
-
-
     # Check for fields that are not editable. Marking them read-only causes them to be ignored, but we wish to 400.
     read_only_fields = set(update.keys()).intersection(
         AccountUserSerializer.get_read_only_fields() + AccountLegacyProfileSerializer.get_read_only_fields()
@@ -162,6 +153,44 @@ def update_account_settings(requesting_user, update, username=None):
                     "user_message": _(u"The '{field_name}' field cannot be edited.").format(field_name=read_only_field)
                 }
                 del update[read_only_field]
+
+    if "email" in update:
+        # Update email in workspace app
+        data = {'oldEmail': existing_user.email,
+                'newEmail': update.get('email')}
+        headers = {'Authorization': settings.WORKSPACE_API_KEY}
+        response = requests.post(
+            'http://10.0.2.3:3000/api/responses/change_email', headers=headers, data=data)
+
+        if not response.status_code == 200:
+            if response.status_code == 404:
+                field_errors['email'] = {
+                    "developer_message": u"User with email:" + existing_user.email + "doesn't exist in workspace.",
+                    "user_message": u"User with email:" + existing_user.email + "doesn't exist in workspace."
+                }
+            elif response.status_code == 403:
+                field_errors['email'] = {
+                    "developer_message": u"Invalid WORKSPACE_API_KEY.",
+                    "user_message": u"Cannot update user email."
+                }
+            elif response.status_code == 400:
+                field_errors['email'] = {
+                    "developer_message": u"Missing new email.",
+                    "user_message": u"Missing new email."
+                }
+            elif response.status_code == 409:
+                field_errors['email'] = {
+                    "developer_message": u"User with the new email already exists in Workspace.",
+                    "user_message": u"User with the new email already exists."
+                }
+            else:
+                field_errors['email'] = {
+                    "developer_message": u"Error updating user email in Workspace",
+                    "user_message": u"Error updating user email"
+                }
+
+            raise AccountUpdateError(field_errors)
+
 
     user_serializer = AccountUserSerializer(existing_user, data=update)
     legacy_profile_serializer = AccountLegacyProfileSerializer(existing_user_profile, data=update)
