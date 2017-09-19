@@ -138,12 +138,9 @@ def update_account_settings(requesting_user, update, username=None):
         old_name = existing_user_profile.name
 
     if "email" in update:
-        # Authenticate requesting user
-        requests.get('http://10.0.2.3:3000/users/auth')
-
         # Update email in workspace app
         data = { 'oldEmail': existing_user.email, 'newEmail': update.get('email') }
-        response = requests.post('http://10.0.2.3:3000/lti/form/change_email', data=data)
+        response = requests.post('http://10.0.2.3:3000/api/responses/change_email', data=data)
         log = logging.getLogger(__name__)
         if response.status_code == 404:
             log.warning("User with email:" + existing_user.email + "doesn't exist in workspace.")
