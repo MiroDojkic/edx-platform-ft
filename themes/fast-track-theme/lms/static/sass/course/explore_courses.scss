@@ -112,8 +112,9 @@ $ft-orange: #f76b1c;
 .affiliate-typeahead-wrapper {
 
   ul {
-    max-width: 100%;
+    max-width: 240px;
     padding: 0px;
+    position: absolute;
 
     background: white;
     border-top: 0.5px solid lightgrey;
