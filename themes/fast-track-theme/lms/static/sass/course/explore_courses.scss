@@ -112,6 +112,7 @@ $ft-orange: #f76b1c;
 .affiliate-typeahead-wrapper {
 
   ul {
+    margin-top: 0;
     max-width: 240px;
     padding: 0px;
     position: absolute;
@@ -157,5 +158,17 @@ $ft-orange: #f76b1c;
         text-decoration: none;
       }
     }
+  }
+}
+
+.sidebar-filter.affiliate-typeahead-wrapper {
+  input[name=affiliate_search].affiliate-typeahead {
+    margin-bottom: 0;
+  }
+}
+
+div.sidebar-filter.affiliate-typeahead-wrapper {
+  ul {
+    margin-left: 1rem;
   }
 }
