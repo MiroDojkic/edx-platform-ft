@@ -161,6 +161,7 @@ $ft-orange: #f76b1c;
   }
 }
 
+// Achieving specificity to override affiliates.scss
 .sidebar-filter.affiliate-typeahead-wrapper {
   input[name=affiliate_search].affiliate-typeahead {
     margin-bottom: 0;
