@@ -45,7 +45,7 @@ def index(request):
     user_messages = []
 
     if not affiliate_id:
-        filters = {}
+        filters = { 'active': True }
         if location_latitude and location_longitude and search_radius:
             from courseware.views.views import get_coordinate_boundaries
             latitude_boundaries, longitude_boundaries = get_coordinate_boundaries(
@@ -69,9 +69,9 @@ def index(request):
             if len(affiliates) > 0:
                 user_messages.append('Affiliates are sorted by the distance!')
     else:
-        affiliates = AffiliateEntity.objects.filter(pk=affiliate_id)
+        affiliates = AffiliateEntity.objects.filter(pk=affiliate_id, active=True)
 
-    all_affiliates = AffiliateEntity.objects.order_by('name')
+    all_affiliates = AffiliateEntity.objects.filter(active=True).order_by('name')
     affiliates_as_json = serializers.serialize('json', all_affiliates, fields=('name', 'id'))
 
     return render_to_response('affiliates/index.html', {
