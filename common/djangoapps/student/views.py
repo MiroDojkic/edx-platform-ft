@@ -584,6 +584,12 @@ def dashboard(request):
     # enrollments, because it could have been a data push snafu.
     course_enrollments = list(get_course_enrollments(user, course_org_filter, org_filter_out_set))
 
+    # Filter out courses of inactive affiliates
+    active_affiliates = AffiliateEntity.objects.filter(active=True)
+    ccxs = CustomCourseForEdX.objects.all()
+    active_ccxs_ids = [unicode(ccx.ccx_course_id) for ccx in ccxs if ccx.affiliate in active_affiliates]
+    course_enrollments = [enrollment for enrollment in course_enrollments if unicode(enrollment.course.id) in active_ccxs_ids]
+
     # sort the enrollment pairs by the enrollment date
     course_enrollments.sort(key=lambda x: x.created, reverse=True)
 
