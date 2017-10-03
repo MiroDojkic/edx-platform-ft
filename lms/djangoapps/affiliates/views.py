@@ -61,7 +61,6 @@ def index(request):
 
         affiliates = AffiliateEntity.objects.filter(**filters).order_by('name')
         if location_latitude and location_longitude:
-            affiliates = affiliates.exclude(Q(location_longitude=None) | Q(location_latitude=None))
             affiliates = sorted(affiliates, key=lambda affiliate: affiliate.distance_from(
             {'latitude': location_latitude, 'longitude': location_longitude}))
 
