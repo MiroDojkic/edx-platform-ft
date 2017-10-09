@@ -13,6 +13,24 @@ from openedx.core.djangolib.js_utils import dump_js_escaped_json
 
 <%block name="bodyclass">view-profile</%block>
 
+<div class="change-password">
+  <button class="change-password-button">
+    Change password
+  </button>
+  <form
+    class="change-password-modal hidden"
+    action="/user_api/v1/accounts/change_password/${data.get('profile_user_id')}/"
+    method="POST"
+  >
+    <input type="hidden" id="csrf_token" name="csrfmiddlewaretoken" value="${csrf_token}">
+    <label class="password-label" for="password">New password</label>
+    <input type="password" name="password">
+    <label class="confirm-password-label" for="password-confirm">Confirm password</label>
+    <input type="password" name="password-confirm">
+    <button type="submit" value="submit" style="margin-top:6px;">Submit</button>
+  </form>
+</div>
+
 <div class="message-banner" aria-live="polite"></div>
 <main id="main" aria-label="Content" tabindex="-1">
     <div class="wrapper-profile">
@@ -21,6 +39,17 @@ from openedx.core.djangolib.js_utils import dump_js_escaped_json
         </div>
     </div>
 </main>
+
+<script>
+  $(document).ready(function() {
+    var changePasswordModal = $('.change-password-modal');
+
+    $('.change-password-button').on('click', function() {
+      changePasswordModal.toggleClass('hidden');
+    });
+  });
+</script>
+
 <%block name="headextra">
     <%static:css group='style-course'/>
 </%block>

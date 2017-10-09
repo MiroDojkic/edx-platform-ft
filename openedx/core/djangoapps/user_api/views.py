@@ -5,6 +5,7 @@ from opaque_keys import InvalidKeyError
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.http import HttpResponse
+from django.shortcuts import redirect
 from django.core.urlresolvers import reverse
 from django.core.exceptions import ImproperlyConfigured, NON_FIELD_ERRORS, ValidationError
 from django.utils.translation import ugettext as _
@@ -1241,6 +1242,20 @@ class RegistrationView(APIView):
                         instructions="",
                         restrictions={}
                     )
+
+
+def change_password(request, user_id):
+    user = User.objects.get(pk=user_id)
+    password = request.POST.get('password')
+    password_confirm = request.POST.get('password-confirm')
+
+    if password and password_confirm and password == password_confirm:
+        user.set_password(password)
+        user.save()
+
+    return redirect(reverse('learner_profile', user.username))
+
+
 
 
 class PasswordResetView(APIView):

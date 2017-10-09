@@ -719,6 +719,57 @@ label.u-field-title {
   width: 100%;
 }
 
+.change-password {
+  display: flex;
+  flex-flow: column wrap;
+
+  position: absolute;
+  right: 542px;
+  top: 82px;
+
+  align-items: flex-end;
+
+  &-modal {
+    display: flex;
+    flex-flow: column wrap;
+    padding: 9px;
+
+    align-items: flex-start;
+    background: $ft-orange;
+    border-radius: 4px;
+
+    button {
+      width: 100%;
+    }
+  }
+
+  &-button {
+    margin-bottom: 6px;
+  }
+
+  .password-label {
+    &, confirm-& {
+      color: white;
+    }
+  }
+}
+
+.no-chrome {
+  background: none;
+  padding: 0;
+  margin: 0;
+  -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+  font-family: inherit;
+  font-weight: normal;
+  font-size: inherit;
+  border: none;
+
+  &:focus,
+  &:active {
+    outline: none;
+  }
+}
+
 .messages {
   display: flex;
   flex-flow: column wrap;
