@@ -746,7 +746,7 @@ label.u-field-title {
   flex-flow: column wrap;
 
   position: absolute;
-  left: 43%;
+  right: 38%;
   top: 82px;
 
   align-items: flex-end;
@@ -769,30 +769,12 @@ label.u-field-title {
     margin-bottom: 6px;
   }
 
-  .password-label {
-    &, confirm-& {
-      color: white;
-    }
+  .label {
+    color: white;
   }
 
   .submit {
     margin-top:6px;
-  }
-}
-
-.no-chrome {
-  background: none;
-  padding: 0;
-  margin: 0;
-  -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
-  font-family: inherit;
-  font-weight: normal;
-  font-size: inherit;
-  border: none;
-
-  &:focus,
-  &:active {
-    outline: none;
   }
 }
 
