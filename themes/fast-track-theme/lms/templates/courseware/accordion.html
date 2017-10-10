@@ -127,10 +127,10 @@ else:
         }
 
         // student time tracking
-        var unitViewStartedAt, lastUnitLocation, windowLoadedAt;
-        var courseId = $('.courseware-results').data('courseId');
+        var unitViewStartedAt, lastUnitLocation, windowLoadedAt, courseId;
 
         $(window).load(function() {
+            courseId = $('.courseware-results').data('courseId');
             unitViewStartedAt = (new Date()).getTime();
             lastUnitLocation = $('.accordion-unit.active').data('unit').location;
         });
