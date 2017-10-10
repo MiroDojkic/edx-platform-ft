@@ -1,5 +1,6 @@
 """HTTP end-points for the User API. """
 import copy
+import json
 
 from opaque_keys import InvalidKeyError
 from django.conf import settings
@@ -1244,18 +1245,22 @@ class RegistrationView(APIView):
                     )
 
 
-def change_password(request, user_id):
-    user = User.objects.get(pk=user_id)
-    password = request.POST.get('password')
-    password_confirm = request.POST.get('password-confirm')
+class ChangePasswordView(APIView):
 
-    if password and password_confirm and password == password_confirm:
+    def post(self, request, user_id):
+        user = User.objects.get(pk=user_id)
+        password = request.POST.get('password')
+        password_confirm = request.POST.get('password-confirm')
+
+        if not password:
+            return HttpResponse(status=400, content='Error: password field is empty.')
+        if not password_confirm or password != password_confirm:
+            return HttpResponse(status=400, content='Error: confirmed password doesn\'t match password.')
+
         user.set_password(password)
         user.save()
 
-    return redirect(reverse('learner_profile', user.username))
-
-
+        return HttpResponse(json.dumps({'id': user.id, 'username': user.username}), content_type="application/json")
 
 
 class PasswordResetView(APIView):
