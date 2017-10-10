@@ -6,8 +6,7 @@
     var displayTime = 4500;
 
     window.showErrorMessage = function(message) {
-      modal.text(message);
-      modal.removeClass('hidden');
+      modal.text(message).removeClass('hidden');
 
       setTimeout(function () {
         modal.addClass('hidden');
