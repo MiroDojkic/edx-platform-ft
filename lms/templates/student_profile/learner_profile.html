@@ -43,6 +43,7 @@ from openedx.core.djangolib.js_utils import dump_js_escaped_json
   $(document).ready(function() {
     var changePasswordPopup = $('.change-password-popup');
     var errorModal = $('.error-modal');
+    var isErrorModalDisplayed = false;
 
     $('.change-password-button').on('click', function() {
       changePasswordPopup.toggleClass('hidden');
@@ -50,12 +51,15 @@ from openedx.core.djangolib.js_utils import dump_js_escaped_json
 
 
     function showErrorMessage(message) {
-      errorModal.append(message);
-      errorModal.toggleClass('hidden');
+      errorModal.append('<span class="error-message">' + message + '</span>');
+      errorModal.removeClass('hidden');
+      isErrorModalDisplayed = true;
 
       setTimeout(function () {
-        errorModal.toggleClass('hidden');
-      }, 5000);
+        errorModal.addClass('hidden');
+        errorModal.find('.error-message').remove();
+        isErrorModalDisplayed = false;
+      }, 3000);
     }
 
 
@@ -66,7 +70,14 @@ from openedx.core.djangolib.js_utils import dump_js_escaped_json
       var data = changePasswordPopup.serialize();
 
       $.post(url, data)
+        .done(function() {
+          changePasswordPopup.removeClass('hidden');
+        })
         .fail(function(err) {
+          if (isErrorModalDisplayed) {
+            errorModal.addClass('hidden');
+            errorModal.find('.error-message').remove();
+          }
           showErrorMessage(err.responseText);
         });
     });

@@ -6,7 +6,6 @@ from opaque_keys import InvalidKeyError
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.http import HttpResponse
-from django.shortcuts import redirect
 from django.core.urlresolvers import reverse
 from django.core.exceptions import ImproperlyConfigured, NON_FIELD_ERRORS, ValidationError
 from django.utils.translation import ugettext as _
@@ -1254,7 +1253,7 @@ class ChangePasswordView(APIView):
 
         if not password:
             return HttpResponse(status=400, content='Error: password field is empty.')
-        if not password_confirm or password != password_confirm:
+        elif not password_confirm or password != password_confirm:
             return HttpResponse(status=400, content='Error: confirmed password doesn\'t match password.')
 
         user.set_password(password)
