@@ -33,10 +33,18 @@ class Auth0ManagementClient(object):
                                  data=json.dumps(payload), headers=headers)
 
         if response.status_code != 200:
-            raise ImproperlyConfigured("Auth0 failed to get token: " + response.text)
+            raise ImproperlyConfigured(
+                "Auth0 failed to get token: " + response.text)
 
         self.__token = response.json()
         self.__token.update({"created_at": datetime.datetime.now()})
 
-    def create_user(self):
-        print 'Creating user...'
+    def create_user(self, user):
+        self.__refresh_token__()
+        url = self.apiUrl + "/users"
+        headers = {"Authorization": "Bearer " +
+                   self.__token.get("access_token")}
+        payload = {"connection": self.connection,
+                   "email": user.email, "password": user.password}
+
+        response = requests.post(url, headers=headers, data=payload)
