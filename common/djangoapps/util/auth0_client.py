@@ -25,7 +25,7 @@ class Auth0ManagementClient(object):
         self.__refresh_token__()
 
     def __refresh_token__(self):
-        headers = {'content-type': "application/json"}
+        headers = {"content-type": "application/json"}
         payload = {"grant_type": "client_credentials", "client_id": self.clientId,
                    "client_secret": self.clientSecret, "audience": self.audience}
 
@@ -33,8 +33,7 @@ class Auth0ManagementClient(object):
                                  data=json.dumps(payload), headers=headers)
 
         if response.status_code != 200:
-          raise ImproperlyConfigured("Auth0 failed to get token: " + response.text)
-
+            raise ImproperlyConfigured("Auth0 failed to get token: " + response.text)
 
         self.__token = response.json()
         self.__token.update({"created_at": datetime.datetime.now()})
