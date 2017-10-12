@@ -2,7 +2,16 @@ import requests
 import json
 import datetime
 
-from django.core.exceptions import ImproperlyConfigured
+
+def with_refresh_token(client_method):
+
+    def wrapper(self, *args):
+        if self.is_token_expired():
+            self.__refresh_token__()
+
+        return client_method(self, *args)
+
+    return wrapper
 
 
 class Auth0ManagementClient(object):
@@ -10,13 +19,13 @@ class Auth0ManagementClient(object):
     __token = {}
     __ttl = 1000 * 60 * 20  # 20 minutes retention
 
-    domainUrl = "https://miro24.eu.auth0.com"
-    apiUrl = "https://miro24.eu.auth0.com/api/v2"
-    clientId = "PPTNJGiVX37s5PJ9mRg3X43nkwPfcma"
-    clientSecret = "3XsT4C88S_PqXr7TZMAULiYBt8M6Uxe_nwZ6uInButlr2CEODeQQ1CcQyZPJJJRy"
-    audience = "mirosapi"
-    connection = "Username-Password-Authentication"
-    connection_id = "con_8kEWS7UQbxq2DqJt"
+    domainUrl = ""
+    apiUrl = ""
+    clientId = ""
+    clientSecret = ""
+    audience = ""
+    connection = ""
+    connection_id = ""
 
     refreshTokenUrl = "https://miro24.eu.auth0.com/oauth/token"
 
@@ -33,18 +42,25 @@ class Auth0ManagementClient(object):
                                  data=json.dumps(payload), headers=headers)
 
         if response.status_code != 200:
-            raise ImproperlyConfigured(
+            raise Exception(
                 "Auth0 failed to get token: " + response.text)
 
         self.__token = response.json()
         self.__token.update({"created_at": datetime.datetime.now()})
 
-    def create_user(self, user):
-        self.__refresh_token__()
+    def is_token_expired(self):
+        return (self.__token.get("created_at") + self.__ttl) < datetime.datetime.now()
+
+    @with_refresh_token
+    def create_user(self, email, password):
         url = self.apiUrl + "/users"
         headers = {"Authorization": "Bearer " +
                    self.__token.get("access_token")}
         payload = {"connection": self.connection,
-                   "email": user.email, "password": user.password}
+                   "email": email, "password": password}
 
         response = requests.post(url, headers=headers, data=payload)
+
+        if response.status_code != 201:
+            raise Exception(
+                "Failed to create user on Auth0: " + response.text)
