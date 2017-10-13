@@ -20,14 +20,11 @@ class Auth0ManagementClient(object):
     __connection = "Username-Password-Authentication"
 
     # Keeping the token shared between instances
-    # by using dict and updating with update method
+    # by using dict and updating with update method.
     __token = {}
 
     def __init__(self):
         self.__url = settings.AUTH0_DOMAIN_URL + "/api/v2"
-
-    def get_token(self):
-        return self.__token
 
     def __refresh_token__(self):
         if not self.is_token_expired():
@@ -38,7 +35,8 @@ class Auth0ManagementClient(object):
         payload = {"grant_type": "client_credentials", "client_id": settings.AUTH0_CLIENT_ID,
                    "client_secret": settings.AUTH0_CLIENT_SECRET, "audience": settings.AUTH0_AUDIENCE}
 
-        response = requests.post(url, data=json.dumps(payload), headers=headers)
+        response = requests.post(
+            url, data=json.dumps(payload), headers=headers)
 
         if response.status_code != 200:
             raise Exception("Auth0 failed to get token: " + response.text)
@@ -57,7 +55,8 @@ class Auth0ManagementClient(object):
     @with_refresh_token
     def create_user(self, email, password):
         url = self.__url + "/users"
-        headers = {"Authorization": "Bearer " + self.__token.get("access_token")}
+        headers = {"Authorization": "Bearer " +
+                   self.__token.get("access_token")}
         payload = {"connection": self.__connection,
                    "email": email, "password": password}
 
