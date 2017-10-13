@@ -143,7 +143,9 @@ SETTING_CHANGE_INITIATED = 'edx.user.settings.change_initiated'
 REGISTRATION_AFFILIATE_ID = 'registration_affiliate_id'
 # used to announce a registration
 REGISTER_USER = Signal(providing_args=["user", "profile"])
-auth0_client = Auth0ManagementClient()
+
+if settings.MIGRATE_TO_AUTH0:
+    auth0_client = Auth0ManagementClient()
 
 # Disable this warning because it doesn't make sense to completely refactor tests to appease Pylint
 # pylint: disable=logging-format-interpolation
@@ -1347,8 +1349,9 @@ def login_user(request, error=""):  # pylint: disable=too-many-statements,unused
             "redirect_url": redirect_url,
         })
 
-        # Migrate user to Auth0
-        auth0_client.create_user(email, password)
+        if user and not user.profile.migrated_to_auth0 and settings.MIGRATE_TO_AUTH0:
+            auth0_client.create_user(email, password)
+            user.profile.set_migrated_to_auth0()
 
         # Ensure that the external marketing site can
         # detect that the user is logged in.
