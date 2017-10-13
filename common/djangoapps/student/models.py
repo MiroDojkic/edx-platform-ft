@@ -381,7 +381,7 @@ class UserProfile(models.Model):
     description = models.CharField(null=True, blank=True, max_length=255, default='')
 
     # presurvey info
-    # filled_presurvey_at = models.DateTimeField(null=True, blank=True)
+    filled_presurvey_at = models.DateTimeField(null=True, blank=True)
 
     # MailChimp interests
     ENTREPRENEUR_MAILCHIMP_INTEREST_ID = '83d6404c2e'
